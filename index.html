@@ -93,7 +93,7 @@ button.b[disabled]{opacity:.45;cursor:default}
 /* join + guru */
 .join{gap:12px}
 .join .rowf{display:flex;flex-wrap:wrap;gap:8px}
-.join input,.join select,.tp input[type=number],.tp select{font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:8px;padding:8px 10px;min-width:0}
+.join input,.join select,.tp input[type=number],.tp input[type=email],.tp input[type=password],.tp select{font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:8px;padding:8px 10px;min-width:0}
 .join input[type=text]{flex:1 1 180px}
 .tp{padding:0}
 .tp>summary{cursor:pointer;font-family:var(--font-display);font-weight:800;font-size:1.1rem;padding:14px 18px;list-style:none}
@@ -164,6 +164,7 @@ fieldset.fld{border:0;padding:0;margin:0}
         <button class="b main" id="tstart">Mulai sesi</button>
         <button class="b warn" id="tstop">Akhiri sesi</button>
         <button class="b" id="treset">Kembali ke lobi</button>
+        <button class="b" id="tlogout">Keluar guru</button>
       </div>
       <p class="fb" id="tmsg"></p>
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
@@ -180,9 +181,35 @@ fieldset.fld{border:0;padding:0;margin:0}
 
   <section class="card board" id="board" hidden></section>
 
+  <details class="card tp" id="tlogin" hidden>
+    <summary>Masuk guru</summary>
+    <div class="in">
+      <form id="tlform" class="fgrid">
+        <label class="fld"><span>Email guru</span><input type="email" id="tlemail" autocomplete="username" required></label>
+        <label class="fld"><span>Kata sandi</span><input type="password" id="tlpass" autocomplete="current-password" required></label>
+        <div class="actions" style="grid-column:1/-1"><button class="b main" id="tlbtn" type="submit">Masuk</button></div>
+      </form>
+      <p class="fb" id="tlmsg"></p>
+    </div>
+  </details>
+
   <p class="note">Tema dan kosakata mengikuti topik buku Bahasa Arab MA Kelas XI. Setiap permainan mengacak soal dari bank 15 soal per tema, jadi tiap siswa mendapat soal dan urutan kata yang berbeda. Guru dapat mencocokkan kalimat dengan edisi buku yang dipakai di kelas.</p>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+/* Konfigurasi Firebase proyek jumlah-mufidah. */
+const FIREBASE_CONFIG={
+  apiKey:"AIzaSyBagwUVTmnscdg_0ExedEa33PTyKT5zG1I",
+  authDomain:"jumlah-mufidah-3e3d3.firebaseapp.com",
+  projectId:"jumlah-mufidah-3e3d3",
+  storageBucket:"jumlah-mufidah-3e3d3.firebasestorage.app",
+  messagingSenderId:"735928610386",
+  appId:"1:735928610386:web:94641773b424141d2f798b"
+};
+</script>
 <script>
 const LEVELS=[
  {ar:"التَّسَوُّقُ",id:"Berbelanja",items:[
@@ -394,7 +421,7 @@ function pushScore(final){
   if(!db||!uid||mode!=="session"||!sessRun)return;
   const data={runId:sessRun,score,solved,answered,done:!!final,ts:Date.now()};
   pushing=pushing.then(()=>db.doc("scores/"+uid).set(data)).catch(e=>{
-    if(!pushWarned){pushWarned=true;const f=$("fb");if(f){f.className="fb no";f.textContent="Skor belum terkirim ke guru. Minta guru memberi akses Kontributor pada akun kamu."}}
+    if(!pushWarned){pushWarned=true;const f=$("fb");if(f){f.className="fb no";f.textContent="Skor belum terkirim ke guru. Periksa koneksi internet."}}
   });
 }
 
@@ -461,7 +488,7 @@ setInterval(tick,500);
 /* ---------- banner, daftar, papan ---------- */
 function renderBanner(){
   let pill="Latihan",pc="",det="Mode latihan bebas. Skor tidak dikirim ke guru.";
-  if(!db){det="Latihan bebas. Sesi kelas dari guru tidak tersedia di versi ini."}
+  if(!db){det="Latihan bebas. Sesi kelas belum tersambung."}
   else if(loadFailed&&!session){det="Data sesi belum dapat dimuat. Periksa koneksi, lalu coba lagi."}
   else if(!session){det=isTeacher?"Belum ada sesi. Atur dan simpan pengaturan di Panel guru.":"Belum ada sesi dari guru. Kamu bisa latihan dulu."}
   else{
@@ -519,7 +546,7 @@ $("join").addEventListener("click",async e=>{
     if(tm&&!teamId){msg.className="fb no";msg.textContent="Pilih tim dulu.";return}
     b.disabled=true;
     try{await db.doc("players/"+uid).set({name,teamId,joinedAt:Date.now(),removed:false})}
-    catch(err){b.disabled=false;msg.className="fb no";msg.textContent="Belum bisa mendaftar. Minta guru memberi akses Kontributor pada akun kamu."}
+    catch(err){b.disabled=false;msg.className="fb no";msg.textContent="Belum bisa mendaftar. Periksa koneksi internet lalu coba lagi."}
   }
 });
 
@@ -583,7 +610,7 @@ async function saveSession(over,okText){
   try{
     await db.doc("session/current").set({...base,...v,teams,...(over||{}),updatedAt:Date.now()});
     tmsg(okText,true);return true;
-  }catch(e){tmsg("Gagal menyimpan: "+(e&&e.code?e.code:"coba lagi"),false);return false}
+  }catch(e){tmsg("Gagal menyimpan: "+ec(e),false);return false}
 }
 $("tsave").onclick=()=>saveSession(null,"Pengaturan disimpan.");
 $("tstart").onclick=()=>saveSession({status:"running",runId:"r"+Date.now().toString(36),startedAt:Date.now()},"Sesi dimulai.");
@@ -595,7 +622,7 @@ $("tshuffle").onclick=async()=>{
   try{
     for(let i=0;i<ids.length;i++)await db.doc("players/"+ids[i]).update({teamId:session.teams[i%session.teams.length].id});
     tmsg("Peserta dibagi ke tim secara acak.",true);
-  }catch(e){tmsg("Gagal membagi tim: "+(e&&e.code?e.code:"coba lagi"),false)}
+  }catch(e){tmsg("Gagal membagi tim: "+ec(e),false)}
 };
 function renderRoster(){
   if(!isTeacher||!db)return;
@@ -617,12 +644,12 @@ function renderRoster(){
 $("roster").addEventListener("click",async e=>{
   const b=e.target.closest("button[data-act]");if(!b)return;
   try{await db.doc("players/"+b.dataset.id).update({removed:b.dataset.act==="rm"})}
-  catch(err){tmsg("Gagal mengubah peserta: "+(err&&err.code?err.code:"coba lagi"),false)}
+  catch(err){tmsg("Gagal mengubah peserta: "+ec(err),false)}
 });
 $("roster").addEventListener("change",async e=>{
   const s=e.target.closest("select[data-id]");if(!s)return;
   try{await db.doc("players/"+s.dataset.id).update({teamId:s.value})}
-  catch(err){tmsg("Gagal memindah tim: "+(err&&err.code?err.code:"coba lagi"),false)}
+  catch(err){tmsg("Gagal memindah tim: "+ec(err),false)}
 });
 
 /* ---------- data bersama ---------- */
@@ -630,20 +657,38 @@ function onData(){
   if(isTeacher&&!formFilled&&session)fillForm();
   renderBanner();renderJoin();renderRoster();renderBoard();
 }
-async function initLive(){
-  let u=null,d=null;
-  try{if(window.claude&&window.claude.use){u=await window.claude.use("user");d=await window.claude.use("db")}}catch(e){}
-  user=u;db=d;
-  if(u){try{isTeacher=await u.canEdit();uid=await u.id();const me=await u.me();myName=me.name||""}catch(e){}}
-  $("tpanel").hidden=!(isTeacher&&db);
-  renderBanner();
-  if(!db)return;
+let fbAuth=null;const subs=[];
+const ec=e=>e&&e.code==="permission-denied"?"akun ini bukan akun guru yang terdaftar di aturan Firestore":(e&&e.code?e.code:"coba lagi");
+function configured(){return typeof FIREBASE_CONFIG==="object"&&FIREBASE_CONFIG.apiKey&&String(FIREBASE_CONFIG.apiKey).indexOf("PASTE")<0}
+function startListeners(){
+  subs.splice(0).forEach(f=>{try{f()}catch(e){}});
   const t=setTimeout(()=>{loadFailed=true;renderBanner()},10000);
   const ok=()=>{clearTimeout(t);loadFailed=false};
   const bad=()=>{clearTimeout(t);loadFailed=true;renderBanner()};
-  db.doc("session/current").onSnapshot(s=>{ok();session=s.exists?s.data():null;onData()},bad);
-  db.collection("players").onSnapshot(q=>{ok();players={};q.docs.forEach(x=>{players[x.id]=x.data()});onData()},bad);
-  db.collection("scores").onSnapshot(q=>{ok();scores={};q.docs.forEach(x=>{scores[x.id]=x.data()});onData()},bad);
+  subs.push(db.doc("session/current").onSnapshot(s=>{ok();session=s.exists?s.data():null;onData()},bad));
+  subs.push(db.collection("players").onSnapshot(q=>{ok();players={};q.docs.forEach(x=>{players[x.id]=x.data()});onData()},bad));
+  subs.push(db.collection("scores").onSnapshot(q=>{ok();scores={};q.docs.forEach(x=>{scores[x.id]=x.data()});onData()},bad));
+}
+$("tlform").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const m=$("tlmsg");
+  if(!fbAuth){m.className="fb no";m.textContent="Firebase belum tersambung.";return}
+  m.className="fb";m.textContent="Masuk…";
+  try{await fbAuth.signInWithEmailAndPassword($("tlemail").value.trim(),$("tlpass").value);m.textContent="";$("tlpass").value=""}
+  catch(err){m.className="fb no";m.textContent="Email atau kata sandi salah."}
+});
+$("tlogout").onclick=()=>{if(fbAuth)fbAuth.signOut()};
+async function initLive(){
+  if(!configured()||typeof firebase==="undefined"){renderBanner();return}
+  try{firebase.initializeApp(FIREBASE_CONFIG);fbAuth=firebase.auth();db=firebase.firestore()}
+  catch(e){db=null;renderBanner();return}
+  fbAuth.onAuthStateChanged(async u=>{
+    if(!u){try{await fbAuth.signInAnonymously()}catch(e){loadFailed=true;renderBanner()}return}
+    uid=u.uid;isTeacher=!u.isAnonymous&&!!u.email;
+    $("tpanel").hidden=!isTeacher;$("tlogin").hidden=isTeacher;
+    joinHtml="";formFilled=false;session=null;players={};scores={};
+    startListeners();renderBanner();renderJoin();renderRoster();renderBoard();
+  });
 }
 
 fillTheme();
