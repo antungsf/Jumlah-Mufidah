@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Susun Kalimat Arab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Bricolage+Grotesque:wght@600;800&family=Figtree:wght@400;600&display=swap">
+<style>
+/* Layout: satu kolom sempit seperti lembar latihan. Di atas: status sesi dan jam. Guru mendapat panel pengaturan; siswa mendapat kartu soal. */
+:root{
+  --bg:#EDF2F1;
+  --surface:#FFFFFF;
+  --ink:#15302D;
+  --muted:#5A7370;
+  --accent:#2F3BA3;
+  --accent-ink:#FFFFFF;
+  --tile:#F6C445;
+  --tile-ink:#2B2200;
+  --line:#C5D3D0;
+  --good:#16794C;
+  --bad:#B3342B;
+  --font-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --font-body:"Figtree","Segoe UI",system-ui,sans-serif;
+  --font-ar:"Amiri","Noto Naskh Arabic","Traditional Arabic",serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F1D1C;--surface:#172927;--ink:#E4EFED;--muted:#93ADA9;--accent:#8E98FF;--accent-ink:#0F1233;
+    --tile:#E9B93A;--tile-ink:#241C00;--line:#2C4441;--good:#4FCB92;--bad:#FF8A80;color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1D1C;--surface:#172927;--ink:#E4EFED;--muted:#93ADA9;--accent:#8E98FF;--accent-ink:#0F1233;
+  --tile:#E9B93A;--tile-ink:#241C00;--line:#2C4441;--good:#4FCB92;--bad:#FF8A80;color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.wrap{max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--font-display);font-weight:800;font-size:clamp(1.7rem,6vw,2.3rem);line-height:1.05;margin:0;text-wrap:balance}
+h3{font-family:var(--font-display);font-size:1.05rem;margin:0}
+.sub{color:var(--muted);margin:4px 0 0;font-size:.95rem}
+.score{font-family:var(--font-display);font-weight:800;font-size:1.6rem;text-align:right;line-height:1;font-variant-numeric:tabular-nums}
+.score small{display:block;font-family:var(--font-body);font-weight:600;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.banner{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px}
+.banner .info{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1 1 220px}
+.banner .det{color:var(--muted);font-size:.88rem}
+.pill{align-self:flex-start;font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;border-radius:999px;padding:2px 10px;border:1.5px solid var(--line);color:var(--muted)}
+.pill.run{border-color:var(--good);color:var(--good)}
+.pill.lobby{border-color:var(--accent);color:var(--accent)}
+.clock{font-family:var(--font-display);font-weight:800;font-size:2rem;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.clock.low{color:var(--bad)}
+.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.lv{font:inherit;text-align:left;background:var(--surface);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;flex-direction:column;gap:2px;min-width:0}
+.lv .ar{font-family:var(--font-ar);font-size:1.25rem;line-height:1.4}
+.lv .id{font-size:.8rem;color:var(--muted)}
+.lv .st{font-size:.78rem;font-variant-numeric:tabular-nums;color:var(--muted)}
+.lv[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.lv:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.card{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:16px}
+.meta{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:.85rem;letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.bar.q i{background:var(--tile);transition:width .4s linear}
+.qt{display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.mean{font-size:1.15rem;font-weight:600;margin:0;text-wrap:balance}
+.mean em{display:block;font-style:normal;font-weight:400;font-size:.85rem;color:var(--muted);margin-bottom:2px;letter-spacing:.06em;text-transform:uppercase}
+.slots{direction:rtl;display:flex;flex-wrap:wrap;gap:8px;min-height:84px;padding:12px;border-radius:10px;border:2px dashed var(--line);align-content:flex-start;transition:border-color .2s}
+.slots.ok{border-color:var(--good);border-style:solid}
+.slots.no{border-color:var(--bad);animation:shake .3s}
+.slots:empty::before{content:"Ketuk kata di bawah untuk menyusun kalimat";direction:ltr;color:var(--muted);font-size:.9rem;align-self:center;margin:0 auto}
+.bank{direction:rtl;display:flex;flex-wrap:wrap;gap:8px;min-height:56px}
+.t{font-family:var(--font-ar);font-size:1.5rem;line-height:1.5;background:var(--tile);color:var(--tile-ink);border:0;border-bottom:3px solid rgba(0,0,0,.25);border-radius:8px;padding:2px 14px;cursor:pointer;touch-action:manipulation}
+.t:active{transform:translateY(2px);border-bottom-width:1px}
+.slots .t{background:var(--accent);color:var(--accent-ink)}
+.slots.ok .t{background:var(--good);color:#fff}
+.t[disabled]{cursor:default}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+button.b{font:inherit;font-weight:600;border-radius:10px;padding:10px 16px;cursor:pointer;border:1.5px solid var(--line);background:transparent;color:var(--ink)}
+button.b.main{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button.b.warn{border-color:var(--bad);color:var(--bad)}
+button.b.sm{padding:4px 10px;font-size:.85rem}
+button.b[disabled]{opacity:.45;cursor:default}
+.fb{min-height:1.5em;margin:0;font-weight:600}
+.fb.ok{color:var(--good)}.fb.no{color:var(--bad)}
+.end{text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center;padding:8px 0}
+.end h2{font-family:var(--font-display);margin:0;font-size:1.5rem}
+.stars{font-size:2rem;letter-spacing:.2em;color:var(--tile)}
+.note{color:var(--muted);font-size:.82rem;margin:0}
+.arinline{font-family:var(--font-ar);font-size:1.2rem}
+/* join + guru */
+.join{gap:12px}
+.join .rowf{display:flex;flex-wrap:wrap;gap:8px}
+.join input,.join select,.tp input[type=number],.tp select{font:inherit;color:var(--ink);background:var(--bg);border:1.5px solid var(--line);border-radius:8px;padding:8px 10px;min-width:0}
+.join input[type=text]{flex:1 1 180px}
+.tp{padding:0}
+.tp>summary{cursor:pointer;font-family:var(--font-display);font-weight:800;font-size:1.1rem;padding:14px 18px;list-style:none}
+.tp>summary::-webkit-details-marker{display:none}
+.tp>summary::after{content:" ▾";color:var(--muted)}
+.tp .in{padding:0 18px 18px;display:flex;flex-direction:column;gap:14px}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.fld{display:flex;flex-direction:column;gap:4px;min-width:0}
+.fld>span,.fld legend{font-size:.78rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.fld small{color:var(--muted);font-size:.78rem}
+fieldset.fld{border:0;padding:0;margin:0}
+.radios{display:flex;gap:14px;flex-wrap:wrap}
+.radios label,.chk{display:flex;align-items:center;gap:6px}
+.roster{display:flex;flex-direction:column;gap:6px;max-height:340px;overflow-y:auto}
+.rrow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center;border-bottom:1px solid var(--line);padding:6px 0}
+.rrow .nm{min-width:0;overflow-wrap:anywhere}
+.rrow .sc{color:var(--muted);font-size:.82rem;font-variant-numeric:tabular-nums}
+.rrow.gone .nm{text-decoration:line-through;color:var(--muted)}
+.rrow select{grid-column:1/-1;font:inherit;font-size:.9rem;background:var(--bg);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:4px 8px}
+.rrow.tm{grid-template-columns:minmax(0,1fr) auto auto auto}
+.rrow.tm select{grid-column:auto}
+.board ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.board li{display:grid;grid-template-columns:2rem minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;border:1.5px solid var(--line)}
+.board li.me{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.board .rk{font-family:var(--font-display);font-weight:800;font-variant-numeric:tabular-nums;color:var(--muted)}
+.board .nm{min-width:0;overflow-wrap:anywhere}
+.board .nm small{display:block;color:var(--muted);font-size:.78rem}
+.board .pt{font-family:var(--font-display);font-weight:800;font-size:1.1rem;text-align:right;font-variant-numeric:tabular-nums}
+.board .pt small{display:block;font-family:var(--font-body);font-weight:400;color:var(--muted);font-size:.74rem}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+@media (prefers-reduced-motion:reduce){.slots.no{animation:none}.bar i{transition:none}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Susun Kalimat Arab</h1>
+      <p class="sub">Bahasa Arab MA Kelas XI · ketuk kata hingga menjadi kalimat yang tepat</p>
+    </div>
+    <div class="score" aria-live="polite"><small>Skor</small><span id="score">0</span></div>
+  </header>
+
+  <section class="banner" id="banner" aria-live="polite"></section>
+
+  <section class="card join" id="join" hidden></section>
+
+  <details class="card tp" id="tpanel" hidden open>
+    <summary>Panel guru</summary>
+    <div class="in">
+      <div class="fgrid">
+        <fieldset class="fld"><legend>Mode permainan</legend>
+          <div class="radios">
+            <label><input type="radio" name="tmode" value="individual" checked> Perorangan</label>
+            <label><input type="radio" name="tmode" value="team"> Tim</label>
+          </div>
+        </fieldset>
+        <label class="fld"><span>Tema soal</span><select id="ttheme"></select></label>
+        <label class="fld"><span>Soal per peserta</span><input type="number" id="tcount" min="1" max="60" value="8" inputmode="numeric"></label>
+        <label class="fld"><span>Waktu total (menit)</span><input type="number" id="ttotal" min="0" max="120" value="10" inputmode="numeric"><small>0 = tanpa batas waktu</small></label>
+        <label class="fld"><span>Waktu per soal (detik)</span><input type="number" id="tperq" min="0" max="180" value="0" inputmode="numeric"><small>0 = tanpa batas per soal</small></label>
+        <label class="fld" id="tteamsrow" hidden><span>Jumlah tim</span><input type="number" id="tteams" min="2" max="8" value="4" inputmode="numeric"></label>
+      </div>
+      <label class="chk"><input type="checkbox" id="tjoin" checked> Pendaftaran peserta dibuka</label>
+      <div class="actions">
+        <button class="b" id="tsave">Simpan pengaturan</button>
+        <button class="b main" id="tstart">Mulai sesi</button>
+        <button class="b warn" id="tstop">Akhiri sesi</button>
+        <button class="b" id="treset">Kembali ke lobi</button>
+      </div>
+      <p class="fb" id="tmsg"></p>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+        <h3>Peserta (<span id="pcount">0</span>)</h3>
+        <button class="b sm" id="tshuffle" hidden>Bagi tim acak</button>
+      </div>
+      <div class="roster" id="roster"></div>
+    </div>
+  </details>
+
+  <div class="levels" id="levels" role="group" aria-label="Pilih tema latihan"></div>
+
+  <section class="card" id="card" aria-live="polite"></section>
+
+  <section class="card board" id="board" hidden></section>
+
+  <p class="note">Tema dan kosakata mengikuti topik buku Bahasa Arab MA Kelas XI. Setiap permainan mengacak soal dari bank 15 soal per tema, jadi tiap siswa mendapat soal dan urutan kata yang berbeda. Guru dapat mencocokkan kalimat dengan edisi buku yang dipakai di kelas.</p>
+</div>
+
+<script>
+const LEVELS=[
+ {ar:"التَّسَوُّقُ",id:"Berbelanja",items:[
+  {w:"ذَهَبَ أَحْمَدُ إِلَى السُّوقِ",x:"مِنَ",m:"Ahmad pergi ke pasar."},
+  {w:"اشْتَرَتْ فَاطِمَةُ ثَوْبًا جَدِيدًا",x:"قَدِيمًا",m:"Fatimah membeli baju baru."},
+  {w:"الْبَائِعُ يَبِيعُ الْفَاكِهَةَ فِي الدُّكَّانِ",x:"عَلَى",m:"Penjual menjual buah di toko."},
+  {w:"كَمْ سِعْرُ هَذَا الْقَمِيصِ؟",x:"مَنْ",m:"Berapa harga kemeja ini?"},
+  {w:"أُرِيدُ أَنْ أَشْتَرِيَ حِذَاءً رَخِيصًا",x:"غَالِيًا",m:"Saya ingin membeli sepatu yang murah."},
+  {w:"زُرْتُ السُّوقَ مَعَ أُمِّي",x:"عَنْ",m:"Saya mengunjungi pasar bersama ibuku."},
+  {w:"هَذَا الْكِتَابُ غَالٍ جِدًّا",x:"رَخِيصٌ",m:"Buku ini sangat mahal."},
+  {w:"اشْتَرَى أَبِي سَيَّارَةً جَدِيدَةً",x:"قَدِيمَةً",m:"Ayahku membeli mobil baru."},
+  {w:"أَيْنَ أَجِدُ الْحَقِيبَةَ؟",x:"مَتَى",m:"Di mana saya menemukan tas?"},
+  {w:"يَدْفَعُ الزَّبُونُ الثَّمَنَ لِلْبَائِعِ",x:"مِنَ",m:"Pembeli membayar harga kepada penjual."},
+  {w:"فِي السُّوقِ خُضَارٌ وَفَاكِهَةٌ",x:"مِنْ",m:"Di pasar ada sayuran dan buah."},
+  {w:"تُحِبُّ أُخْتِي شِرَاءَ الْمَلَابِسِ",x:"تَكْرَهُ",m:"Saudara perempuanku suka membeli pakaian."},
+  {w:"هَلْ عِنْدَكَ قَلَمٌ جَمِيلٌ؟",x:"مَنْ",m:"Apakah kamu punya pena yang bagus?"},
+  {w:"التَّخْفِيضُ كَبِيرٌ فِي الْمَتْجَرِ",x:"عَلَى",m:"Diskonnya besar di toko."},
+  {w:"أَعْطَانِي الْبَائِعُ الْبَاقِيَ",x:"عَنِ",m:"Penjual memberiku uang kembaliannya."}]},
+ {ar:"رَأْسُ السَّنَةِ الْهِجْرِيَّةِ",id:"Tahun Baru Hijriah",items:[
+  {w:"هَاجَرَ النَّبِيُّ مِنْ مَكَّةَ إِلَى الْمَدِينَةِ",x:"فِي",m:"Nabi berhijrah dari Makkah ke Madinah."},
+  {w:"تَبْدَأُ السَّنَةُ الْهِجْرِيَّةُ بِشَهْرِ الْمُحَرَّمِ",x:"عَنْ",m:"Tahun Hijriah dimulai dengan bulan Muharram."},
+  {w:"يَحْتَفِلُ الْمُسْلِمُونَ بِرَأْسِ السَّنَةِ الْهِجْرِيَّةِ",x:"مَعَ",m:"Umat Islam memperingati tahun baru Hijriah."},
+  {w:"اتَّخَذَ عُمَرُ الْهِجْرَةَ بِدَايَةً لِلتَّقْوِيمِ",x:"نِهَايَةً",m:"Umar menjadikan hijrah sebagai awal penanggalan."},
+  {w:"نَقْرَأُ الْقُرْآنَ فِي الْمَسْجِدِ",x:"إِلَى",m:"Kami membaca Al-Qur'an di masjid."},
+  {w:"يَقَعُ الْمُحَرَّمُ فِي أَوَّلِ السَّنَةِ الْهِجْرِيَّةِ",x:"آخِرِ",m:"Muharram jatuh di awal tahun Hijriah."},
+  {w:"صَحِبَ أَبُو بَكْرٍ النَّبِيَّ فِي الْهِجْرَةِ",x:"عَنْ",m:"Abu Bakar menemani Nabi dalam hijrah."},
+  {w:"اسْتَقْبَلَ الْأَنْصَارُ الْمُهَاجِرِينَ فِي الْمَدِينَةِ",x:"مِنْ",m:"Kaum Anshar menyambut kaum Muhajirin di Madinah."},
+  {w:"السَّنَةُ الْهِجْرِيَّةُ تَعْتَمِدُ عَلَى الْقَمَرِ",x:"الشَّمْسِ",m:"Tahun Hijriah berdasarkan peredaran bulan."},
+  {w:"نَتَعَلَّمُ مِنَ الْهِجْرَةِ الصَّبْرَ وَالشَّجَاعَةَ",x:"عَنِ",m:"Kita belajar kesabaran dan keberanian dari hijrah."},
+  {w:"يَدْعُو الْمُسْلِمُونَ اللهَ فِي بِدَايَةِ الْعَامِ",x:"نِهَايَةِ",m:"Umat Islam berdoa kepada Allah di awal tahun."},
+  {w:"خَرَجَ النَّبِيُّ لَيْلًا مِنْ مَكَّةَ",x:"نَهَارًا",m:"Nabi keluar dari Makkah pada malam hari."},
+  {w:"عَدَدُ شُهُورِ السَّنَةِ اثْنَا عَشَرَ شَهْرًا",x:"ثَلَاثَةَ",m:"Jumlah bulan dalam setahun ada dua belas."},
+  {w:"أَقَامَ النَّبِيُّ الْمَسْجِدَ فِي الْمَدِينَةِ",x:"هَدَمَ",m:"Nabi mendirikan masjid di Madinah."},
+  {w:"تُذَكِّرُنَا الْهِجْرَةُ بِتَضْحِيَةِ الصَّحَابَةِ",x:"بَيْنَ",m:"Hijrah mengingatkan kita pada pengorbanan para sahabat."}]},
+ {ar:"الْأُسْرَةُ وَالسَّكَنُ",id:"Keluarga dan Asrama",items:[
+  {w:"يَنَامُ الطُّلَّابُ فِي الْغُرْفَةِ",x:"مِنَ",m:"Para siswa tidur di kamar."},
+  {w:"تَسْتَيْقِظُ أُسْرَتِي قَبْلَ الْفَجْرِ",x:"بَعْدَ",m:"Keluargaku bangun sebelum subuh."},
+  {w:"أَدْرُسُ مَعَ أَصْدِقَائِي بَعْدَ الْعَصْرِ",x:"قَبْلَ",m:"Saya belajar bersama teman-temanku setelah asar."},
+  {w:"أَبِي مُعَلِّمٌ وَأُمِّي طَبِيبَةٌ",x:"فِي",m:"Ayahku seorang guru dan ibuku seorang dokter."},
+  {w:"نَأْكُلُ الْعَشَاءَ مَعَ الْأُسْرَةِ",x:"عَلَى",m:"Kami makan malam bersama keluarga."},
+  {w:"أُسْرَتِي صَغِيرَةٌ وَسَعِيدَةٌ",x:"كَبِيرَةٌ",m:"Keluargaku kecil dan bahagia."},
+  {w:"يَجْلِسُ الطُّلَّابُ فِي مَكْتَبَةِ السَّكَنِ",x:"تَحْتَ",m:"Para siswa duduk di perpustakaan asrama."},
+  {w:"يُصَلِّي أَخِي الْفَجْرَ فِي الْمَسْجِدِ",x:"عَنْ",m:"Kakakku shalat subuh di masjid."},
+  {w:"تُسَاعِدُ الْبِنْتُ أُمَّهَا فِي الْمَطْبَخِ",x:"مِنْ",m:"Anak perempuan membantu ibunya di dapur."},
+  {w:"مَتَى تَرْجِعُ مِنَ الْمَدْرَسَةِ؟",x:"أَيْنَ",m:"Kapan kamu pulang dari sekolah?"},
+  {w:"فِي غُرْفَتِي سَرِيرٌ وَمَكْتَبٌ",x:"عَنْ",m:"Di kamarku ada tempat tidur dan meja belajar."},
+  {w:"نَغْسِلُ الْمَلَابِسَ يَوْمَ الْجُمُعَةِ",x:"عَنْ",m:"Kami mencuci pakaian pada hari Jumat."},
+  {w:"جَدِّي يَسْكُنُ فِي الْقَرْيَةِ",x:"الْمَدِينَةِ",m:"Kakekku tinggal di desa."},
+  {w:"يَجْتَمِعُ أَفْرَادُ الْأُسْرَةِ فِي الْمَسَاءِ",x:"عَنِ",m:"Anggota keluarga berkumpul pada sore hari."},
+  {w:"نُنَظِّفُ غُرْفَتَنَا كُلَّ صَبَاحٍ",x:"عَلَى",m:"Kami membersihkan kamar kami setiap pagi."}]},
+ {ar:"الْأَدْيَانُ فِي إِنْدُونِيسِيَا",id:"Agama di Indonesia",items:[
+  {w:"فِي إِنْدُونِيسِيَا أَدْيَانٌ كَثِيرَةٌ",x:"مِنْ",m:"Di Indonesia ada banyak agama."},
+  {w:"يُحِبُّ الشَّعْبُ التَّسَامُحَ بَيْنَ الْأَدْيَانِ",x:"عَلَى",m:"Rakyat menyukai toleransi antar agama."},
+  {w:"يَعِيشُ الْمُسْلِمُونَ مَعَ أَتْبَاعِ الْأَدْيَانِ الْأُخْرَى بِسَلَامٍ",x:"ضِدَّ",m:"Umat Islam hidup damai bersama pemeluk agama lain."},
+  {w:"نَحْتَرِمُ عِبَادَةَ الْآخَرِينَ",x:"نَكْرَهُ",m:"Kami menghormati ibadah orang lain."},
+  {w:"التَّسَامُحُ يَجْمَعُ الشَّعْبَ",x:"يُفَرِّقُ",m:"Toleransi mempersatukan rakyat."},
+  {w:"الْمُسْلِمُونَ وَالْمَسِيحِيُّونَ جِيرَانٌ",x:"أَعْدَاءٌ",m:"Umat Islam dan Kristen bertetangga."},
+  {w:"تَحْمِي الدَّوْلَةُ حُرِّيَّةَ الْعِبَادَةِ",x:"عَنْ",m:"Negara melindungi kebebasan beribadah."},
+  {w:"يَعِيشُ الْهِنْدُوسُ فِي جَزِيرَةِ بَالِي",x:"مِنْ",m:"Pemeluk Hindu tinggal di pulau Bali."},
+  {w:"بُورُوبُودُورُ مَعْبَدٌ بُوذِيٌّ قَدِيمٌ",x:"حَدِيثٌ",m:"Borobudur adalah candi Buddha yang kuno."},
+  {w:"نَزُورُ جِيرَانَنَا فِي الْأَعْيَادِ",x:"عَنْ",m:"Kami mengunjungi tetangga pada hari raya."},
+  {w:"الْحِوَارُ بَيْنَ الْأَدْيَانِ يَزِيدُ الْمَحَبَّةَ",x:"يُقَلِّلُ",m:"Dialog antar agama menambah kasih sayang."},
+  {w:"الشِّعَارُ الْوَطَنِيُّ هُوَ الْوَحْدَةُ فِي التَّنَوُّعِ",x:"مِنَ",m:"Semboyan nasional adalah persatuan dalam keberagaman."},
+  {w:"لِكُلِّ إِنْسَانٍ حَقٌّ فِي اخْتِيَارِ دِينِهِ",x:"عَنْ",m:"Setiap orang berhak memilih agamanya."},
+  {w:"نَتَعَاوَنُ مَعَ الْجَمِيعِ لِبِنَاءِ الْوَطَنِ",x:"ضِدَّ",m:"Kita bekerja sama dengan semua orang membangun tanah air."},
+  {w:"السَّلَامُ أَسَاسُ الْحَيَاةِ الْمُشْتَرَكَةِ",x:"الْحَرْبُ",m:"Perdamaian adalah dasar kehidupan bersama."}]}
+];
+const TEAMNAMES=["Alif","Ba","Ta","Tsa","Jim","Ha","Kho","Dal"];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt=ms=>{const s=Math.max(0,Math.ceil(ms/1000));return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")};
+function shuffle(a){const r=a.slice();for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]]}return r}
+
+/* ---------- state ---------- */
+let db=null,user=null,uid=null,isTeacher=false,myName="",loadFailed=false;
+let session=null,players={},scores={};
+let mode="practice",gameOver=false,sessRun=null,sessCfg=null,offset=0;
+let lv=0,qi=0,score=0,solved=0,answered=0,tries=0,hinted=0,done=false,qStart=0,qExpired=false;
+let round=[],bank=[],slots=[];
+let best=[0,0,0,0];
+try{const s=JSON.parse(localStorage.getItem("susun-best")||"[]");if(Array.isArray(s))best=[0,1,2,3].map(i=>+s[i]||0)}catch(e){}
+
+const poolOf=th=>th==="all"?LEVELS.flatMap(l=>l.items):LEVELS[+th].items;
+const themeName=th=>th==="all"?"Campuran semua tema":LEVELS[+th].id;
+function effStatus(){
+  if(!session)return null;
+  if(session.status==="running"&&session.totalMin>0&&Date.now()>=session.startedAt+session.totalMin*60000)return "ended";
+  return session.status;
+}
+const myScore=()=>{const s=scores[uid];return s&&session&&s.runId===session.runId?s:null};
+const teamName=id=>{const t=(session&&session.teams||[]).find(x=>x.id===id);return t?t.name:""};
+
+/* ---------- permainan ---------- */
+const cur=()=>round[qi];
+const words=()=>cur().w.split(" ");
+
+function renderLevels(){
+  $("levels").hidden=mode==="session";
+  $("levels").innerHTML=LEVELS.map((l,i)=>`<button class="lv" data-i="${i}" aria-pressed="${i===lv}"><span class="ar" lang="ar" dir="rtl">${l.ar}</span><span class="id">${l.id}</span><span class="st">Terbaik: ${best[i]} / 80 · bank ${l.items.length} soal</span></button>`).join("");
+}
+$("levels").addEventListener("click",e=>{const b=e.target.closest(".lv");if(!b)return;lv=+b.dataset.i;startPractice()});
+
+function startPractice(){
+  mode="practice";gameOver=false;sessRun=null;sessCfg=null;offset=0;
+  round=shuffle(LEVELS[lv].items).slice(0,8);
+  qi=0;score=0;solved=0;answered=0;
+  $("score").textContent=score;
+  renderLevels();renderJoin();
+  beginQuestion();
+}
+
+function startSession(){
+  if(!session||effStatus()!=="running"||!uid)return;
+  const ex=myScore();
+  if(ex&&ex.done){renderJoin();return}
+  const pool=poolOf(session.theme);
+  const total=Math.min(session.count,pool.length);
+  const a0=ex?ex.answered:0;
+  mode="session";gameOver=false;sessRun=session.runId;sessCfg={perQ:session.perQ||0,total};
+  offset=a0;score=ex?ex.score:0;solved=ex?ex.solved:0;answered=a0;
+  round=shuffle(pool).slice(0,Math.max(0,total-a0));
+  qi=0;
+  $("score").textContent=score;
+  renderLevels();renderJoin();
+  if(!round.length){finish("");return}
+  beginQuestion();
+}
+
+function beginQuestion(){
+  const q=cur(),ws=words();
+  tries=0;hinted=0;done=false;slots=[];qExpired=false;qStart=Date.now();
+  const all=ws.map((t,i)=>({t,k:i})).concat([{t:q.x,k:-1}]);
+  let sh=shuffle(all);
+  if(sh.slice(0,ws.length).map(o=>o.k).join()===ws.map((_,i)=>i).join()&&ws.length>1)sh=shuffle(all);
+  bank=sh;
+  draw("");
+}
+
+function draw(msg,cls){
+  const n=offset+round.length,q=cur();
+  const sess=mode==="session"&&sessCfg&&sessCfg.perQ>0;
+  $("card").innerHTML=`
+   <div class="meta"><span>Soal ${offset+qi+1} dari ${n}</span><span>${mode==="session"?"Sesi kelas":LEVELS[lv].id}</span></div>
+   <div class="bar"><i style="width:${(offset+qi)/n*100}%"></i></div>
+   ${sess?`<div class="bar q"><i id="qbar" style="width:100%"></i></div><div class="qt"><span>Waktu soal</span><span id="qleft">${sessCfg.perQ} d</span></div>`:""}
+   <p class="mean"><em>Artinya</em>${esc(q.m)}</p>
+   <div class="slots ${cls||""}" id="slots" lang="ar" dir="rtl">${slots.map(o=>`<button class="t" data-k="${o.k}" data-w="s" ${done?"disabled":""}>${o.t}</button>`).join("")}</div>
+   <div class="bank" id="bank" lang="ar" dir="rtl">${bank.map(o=>`<button class="t" data-k="${o.k}" data-w="b" ${done?"disabled":""}>${o.t}</button>`).join("")}</div>
+   <p class="fb ${cls||""}" id="fb">${msg}</p>
+   <div class="actions">
+     ${done?`<button class="b main" id="next">${qi+1>=round.length?"Lihat hasil":"Soal berikutnya"}</button>`:
+     `<button class="b main" id="chk" ${slots.length?"":"disabled"}>Periksa</button>
+      <button class="b" id="hint">Petunjuk (−3)</button>
+      <button class="b" id="clr" ${slots.length?"":"disabled"}>Ulangi</button>`}
+   </div>`;
+  document.querySelectorAll("#card .t").forEach(b=>b.onclick=()=>{
+    if(done)return;
+    const k=+b.dataset.k,from=b.dataset.w==="b"?bank:slots,to=from===bank?slots:bank;
+    const i=from.findIndex(o=>o.k===k);const [o]=from.splice(i,1);to.push(o);
+    draw("");
+  });
+  const c=$("chk");if(c)c.onclick=check;
+  const h=$("hint");if(h)h.onclick=hint;
+  const r=$("clr");if(r)r.onclick=()=>{bank=bank.concat(slots);slots=[];draw("")};
+  const nx=$("next");if(nx)nx.onclick=()=>{qi++;if(qi>=round.length)finish("");else beginQuestion()};
+  tick();
+}
+
+function check(){
+  if(done)return;
+  const ok=slots.map(o=>o.t).join(" ")===cur().w;
+  tries++;
+  if(ok){
+    const pts=Math.max(2,(tries===1?10:tries===2?5:2)-hinted*3);
+    score+=pts;solved++;answered++;done=true;
+    $("score").textContent=score;
+    draw(`Benar! +${pts} poin`,"ok");
+    pushScore(false);
+  }else{
+    const ws=words();
+    const first=slots.findIndex((o,i)=>o.t!==ws[i]);
+    const extra=slots.some(o=>o.k===-1)?" Ada kata yang tidak dipakai dalam kalimat ini.":"";
+    draw(`Belum tepat. Perhatikan urutan kata ke-${(first<0?slots.length:first)+1}.${extra}`,"no");
+  }
+}
+
+function hint(){
+  const ws=words();
+  bank=bank.concat(slots);slots=[];
+  for(let i=0;i<Math.min(2,ws.length);i++){
+    const j=bank.findIndex(o=>o.k===i);
+    if(j>-1){slots.push(bank.splice(j,1)[0])}
+  }
+  hinted++;
+  draw("Dua kata pertama sudah ditempatkan. Lanjutkan sendiri.");
+}
+
+function expireQuestion(){
+  if(done)return;
+  qExpired=true;done=true;answered++;
+  const ws=words();
+  slots=ws.map((t,i)=>({t,k:i}));bank=[];
+  draw(`Waktu soal habis. Jawaban benar: <span class="arinline" lang="ar" dir="rtl">${cur().w}</span>`,"no");
+  pushScore(false);
+}
+
+let pushing=Promise.resolve(),pushWarned=false;
+function pushScore(final){
+  if(!db||!uid||mode!=="session"||!sessRun)return;
+  const data={runId:sessRun,score,solved,answered,done:!!final,ts:Date.now()};
+  pushing=pushing.then(()=>db.doc("scores/"+uid).set(data)).catch(e=>{
+    if(!pushWarned){pushWarned=true;const f=$("fb");if(f){f.className="fb no";f.textContent="Skor belum terkirim ke guru. Minta guru memberi akses Kontributor pada akun kamu."}}
+  });
+}
+
+function finish(reason){
+  if(mode==="session"){
+    gameOver=true;
+    if(!done&&round.length&&qi<round.length){/* soal yang belum selesai tidak dihitung */}
+    pushScore(true);
+    const total=sessCfg?sessCfg.total:0;
+    $("card").innerHTML=`<div class="end">
+      <div class="stars" aria-hidden="true">★</div>
+      <h2>${reason||"Sesi selesai"}</h2>
+      <p style="margin:0">Skor kamu <strong>${score}</strong>. Benar ${solved} dari ${total} soal.</p>
+      <p class="note">Hasil dikirim ke papan skor.</p>
+      <div class="actions" style="justify-content:center"><button class="b" id="topractice">Latihan bebas</button></div></div>`;
+    $("topractice").onclick=()=>startPractice();
+    renderJoin();renderBanner();
+    return;
+  }
+  const l=LEVELS[lv],max=round.length*10,pct=score/max;
+  const st=pct>=.85?3:pct>=.6?2:1;
+  if(score>best[lv]){best[lv]=score;try{localStorage.setItem("susun-best",JSON.stringify(best))}catch(e){}}
+  renderLevels();
+  const nextLv=(lv+1)%LEVELS.length;
+  $("card").innerHTML=`<div class="end">
+    <div class="stars" aria-label="${st} dari 3 bintang">${"★".repeat(st)}${"☆".repeat(3-st)}</div>
+    <h2>Latihan selesai</h2>
+    <p style="margin:0">Skor kamu ${score} dari ${max}.</p>
+    <div class="actions" style="justify-content:center">
+      <button class="b main" id="again">Main lagi</button>
+      <button class="b" id="nextlv">Tema: ${LEVELS[nextLv].id}</button>
+    </div></div>`;
+  $("again").onclick=()=>startPractice();
+  $("nextlv").onclick=()=>{lv=nextLv;startPractice()};
+}
+
+/* ---------- jam ---------- */
+function tick(){
+  const st=effStatus();
+  const clk=$("clock");
+  if(clk){
+    if(!session)clk.textContent="";
+    else if(st==="running"){
+      if(session.totalMin>0){const r=session.startedAt+session.totalMin*60000-Date.now();clk.textContent=fmt(r);clk.classList.toggle("low",r<=30000)}
+      else{clk.textContent="Tanpa batas";clk.classList.remove("low")}
+    }else if(st==="ended"){clk.textContent="00:00";clk.classList.remove("low")}
+    else{clk.textContent=session.totalMin>0?fmt(session.totalMin*60000):"Tanpa batas";clk.classList.remove("low")}
+  }
+  if(mode==="session"&&!gameOver){
+    if(!session||session.runId!==sessRun||st!=="running"){
+      finish(st==="ended"?"Waktu sesi habis":"Sesi dihentikan guru");return;
+    }
+    if(sessCfg.perQ>0&&!done){
+      const left=sessCfg.perQ-(Date.now()-qStart)/1000;
+      const ql=$("qleft"),qb=$("qbar");
+      if(ql)ql.textContent=Math.max(0,Math.ceil(left))+" d";
+      if(qb)qb.style.width=Math.max(0,left/sessCfg.perQ*100)+"%";
+      if(left<=0)expireQuestion();
+    }
+  }
+}
+setInterval(tick,500);
+
+/* ---------- banner, daftar, papan ---------- */
+function renderBanner(){
+  let pill="Latihan",pc="",det="Mode latihan bebas. Skor tidak dikirim ke guru.";
+  if(!db){det="Latihan bebas. Sesi kelas dari guru tidak tersedia di versi ini."}
+  else if(loadFailed&&!session){det="Data sesi belum dapat dimuat. Periksa koneksi, lalu coba lagi."}
+  else if(!session){det=isTeacher?"Belum ada sesi. Atur dan simpan pengaturan di Panel guru.":"Belum ada sesi dari guru. Kamu bisa latihan dulu."}
+  else{
+    const st=effStatus();
+    pill=st==="running"?"Sesi berlangsung":st==="ended"?"Sesi selesai":"Lobi";
+    pc=st==="running"?"run":st==="lobby"?"lobby":"";
+    det=`${session.mode==="team"?"Tim":"Perorangan"} · ${themeName(session.theme)} · ${session.count} soal`+
+      (session.perQ>0?` · ${session.perQ} d per soal`:"")+
+      (st==="lobby"?" · menunggu guru memulai":"");
+  }
+  $("banner").innerHTML=`<div class="info"><span class="pill ${pc}">${pill}</span><span class="det">${esc(det)}</span></div><div class="clock" id="clock"></div>`;
+  tick();
+}
+
+let joinHtml="";
+function renderJoin(){
+  const el=$("join");
+  let h="";
+  if(db&&uid&&!isTeacher&&session){
+    const me=players[uid],st=effStatus();
+    if(me&&me.removed){
+      h=`<p class="fb no" style="margin:0">Guru mengeluarkan kamu dari sesi ini. Latihan bebas tetap bisa dipakai.</p>`;
+    }else if(me){
+      const tn=session.mode==="team"?(teamName(me.teamId)||"belum masuk tim"):"";
+      let act="";
+      const ms=myScore();
+      if(st==="running"){
+        if(ms&&ms.done)act=`<span class="note">Kamu sudah selesai. Lihat papan skor.</span>`;
+        else if(mode==="session"&&!gameOver)act=`<span class="note">Sedang bermain…</span>`;
+        else act=`<button class="b main" data-act="play">${ms&&ms.answered?"Lanjutkan sesi":"Mulai bermain"}</button>`;
+      }else if(st==="lobby")act=`<span class="note">Menunggu guru memulai sesi.</span>`;
+      else act=`<span class="note">Sesi sudah selesai.</span>`;
+      h=`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><div><strong>${esc(me.name)}</strong>${tn?` · ${esc(tn)}`:""}<br><span class="note">Terdaftar di sesi</span></div>${act}</div>`;
+    }else if(session.joinOpen&&st!=="ended"){
+      const tm=session.mode==="team";
+      h=`<h3>Ikut sesi kelas</h3><div class="rowf"><input type="text" id="jname" maxlength="30" placeholder="Nama kamu" value="${esc(myName)}" aria-label="Nama kamu">${
+        tm?`<select id="jteam" aria-label="Pilih tim"><option value="">Pilih tim</option>${(session.teams||[]).map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join("")}</select>`:""
+      }<button class="b main" data-act="join">Ikut sesi</button></div><p class="fb" id="jmsg" style="margin:0"></p>`;
+    }else{
+      h=`<p class="note" style="margin:0">Pendaftaran peserta ditutup oleh guru.</p>`;
+    }
+  }
+  el.hidden=!h;
+  if(h!==joinHtml){joinHtml=h;el.innerHTML=h}
+}
+$("join").addEventListener("click",async e=>{
+  const b=e.target.closest("button[data-act]");if(!b)return;
+  if(b.dataset.act==="play"){startSession();return}
+  if(b.dataset.act==="join"){
+    const name=($("jname").value||"").trim().slice(0,30);
+    const msg=$("jmsg");
+    if(!name){msg.className="fb no";msg.textContent="Isi nama dulu.";return}
+    const tm=session&&session.mode==="team";
+    const teamId=tm?($("jteam").value||""):"";
+    if(tm&&!teamId){msg.className="fb no";msg.textContent="Pilih tim dulu.";return}
+    b.disabled=true;
+    try{await db.doc("players/"+uid).set({name,teamId,joinedAt:Date.now(),removed:false})}
+    catch(err){b.disabled=false;msg.className="fb no";msg.textContent="Belum bisa mendaftar. Minta guru memberi akses Kontributor pada akun kamu."}
+  }
+});
+
+let boardHtml="";
+function renderBoard(){
+  const el=$("board");
+  if(!db||!session||!session.runId){el.hidden=true;return}
+  const run=session.runId;
+  const act=Object.entries(players).filter(([id,p])=>!p.removed);
+  const sc=id=>{const s=scores[id];return s&&s.runId===run?s:null};
+  let rows=[];
+  if(session.mode==="team"){
+    rows=(session.teams||[]).map(t=>{
+      const m=act.filter(([id,p])=>p.teamId===t.id);
+      const tot=m.reduce((a,[id])=>a+(sc(id)?sc(id).score:0),0);
+      const mine=m.some(([id])=>id===uid);
+      return {name:t.name,sub:m.length+" anggota",main:m.length?Math.round(tot/m.length*10)/10:0,small:"total "+tot,me:mine,key:m.length?tot/m.length:0};
+    }).filter(r=>r.sub!=="0 anggota").sort((a,b)=>b.key-a.key);
+  }else{
+    rows=act.map(([id,p])=>{const s=sc(id);return {name:p.name,sub:s?(s.done?"selesai · ":"")+s.answered+" soal":"belum mulai",main:s?s.score:0,small:"poin",me:id===uid,key:s?s.score:-1}}).sort((a,b)=>b.key-a.key||a.name.localeCompare(b.name));
+  }
+  let h=`<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><h3>Papan skor</h3><span class="note">${session.mode==="team"?"urut rata-rata skor per anggota":"urut skor"}</span></div>`;
+  h+=rows.length?`<ol>${rows.map((r,i)=>`<li class="${r.me?"me":""}"><span class="rk">${i+1}</span><span class="nm">${esc(r.name)}${r.me?" (kamu)":""}<small>${esc(r.sub)}</small></span><span class="pt">${r.main}<small>${esc(r.small)}</small></span></li>`).join("")}</ol>`:`<p class="note" style="margin:0">Belum ada peserta di sesi ini.</p>`;
+  el.hidden=false;
+  if(h!==boardHtml){boardHtml=h;el.innerHTML=h}
+}
+
+/* ---------- panel guru ---------- */
+let formFilled=false,rosterHtml="";
+function fillTheme(){
+  $("ttheme").innerHTML=`<option value="all">Campuran semua tema (60 soal)</option>`+LEVELS.map((l,i)=>`<option value="${i}">${l.id} (${l.items.length} soal)</option>`).join("");
+}
+function syncTeamRow(){
+  const tm=document.querySelector('input[name=tmode]:checked').value==="team";
+  $("tteamsrow").hidden=!tm;$("tshuffle").hidden=!tm;
+}
+document.querySelectorAll("input[name=tmode]").forEach(r=>r.onchange=syncTeamRow);
+function fillForm(){
+  if(!session)return;
+  formFilled=true;
+  document.querySelector(`input[name=tmode][value=${session.mode==="team"?"team":"individual"}]`).checked=true;
+  $("ttheme").value=String(session.theme);
+  $("tcount").value=session.count;$("ttotal").value=session.totalMin;$("tperq").value=session.perQ;
+  $("tteams").value=session.teamCount||4;$("tjoin").checked=!!session.joinOpen;
+  syncTeamRow();
+}
+function formVals(){
+  const mode=document.querySelector('input[name=tmode]:checked').value;
+  const theme=$("ttheme").value;
+  const num=(id,min,max,def)=>{let v=parseInt($(id).value,10);if(isNaN(v))v=def;return Math.min(max,Math.max(min,v))};
+  const pool=poolOf(theme).length;
+  const v={mode,theme,count:num("tcount",1,pool,8),totalMin:num("ttotal",0,120,10),perQ:num("tperq",0,180,0),teamCount:num("tteams",2,8,4),joinOpen:$("tjoin").checked};
+  $("tcount").value=v.count;$("ttotal").value=v.totalMin;$("tperq").value=v.perQ;$("tteams").value=v.teamCount;
+  return v;
+}
+function tmsg(t,ok){const m=$("tmsg");m.textContent=t;m.className="fb "+(ok?"ok":"no")}
+async function saveSession(over,okText){
+  const base=session||{status:"lobby",runId:null,startedAt:null};
+  const v=formVals();
+  const teams=TEAMNAMES.slice(0,v.teamCount).map((n,i)=>({id:"t"+(i+1),name:"Tim "+n}));
+  try{
+    await db.doc("session/current").set({...base,...v,teams,...(over||{}),updatedAt:Date.now()});
+    tmsg(okText,true);return true;
+  }catch(e){tmsg("Gagal menyimpan: "+(e&&e.code?e.code:"coba lagi"),false);return false}
+}
+$("tsave").onclick=()=>saveSession(null,"Pengaturan disimpan.");
+$("tstart").onclick=()=>saveSession({status:"running",runId:"r"+Date.now().toString(36),startedAt:Date.now()},"Sesi dimulai.");
+$("tstop").onclick=()=>saveSession({status:"ended"},"Sesi diakhiri.");
+$("treset").onclick=()=>saveSession({status:"lobby",runId:null,startedAt:null},"Kembali ke lobi. Skor sesi sebelumnya tidak ditampilkan lagi.");
+$("tshuffle").onclick=async()=>{
+  if(!session||session.mode!=="team"||!(session.teams||[]).length){tmsg("Simpan mode Tim dulu.",false);return}
+  const ids=shuffle(Object.keys(players).filter(id=>!players[id].removed));
+  try{
+    for(let i=0;i<ids.length;i++)await db.doc("players/"+ids[i]).update({teamId:session.teams[i%session.teams.length].id});
+    tmsg("Peserta dibagi ke tim secara acak.",true);
+  }catch(e){tmsg("Gagal membagi tim: "+(e&&e.code?e.code:"coba lagi"),false)}
+};
+function renderRoster(){
+  if(!isTeacher||!db)return;
+  const ids=Object.keys(players).sort((a,b)=>(players[a].joinedAt||0)-(players[b].joinedAt||0));
+  $("pcount").textContent=ids.filter(id=>!players[id].removed).length;
+  const tm=session&&session.mode==="team";
+  const run=session&&session.runId;
+  const h=ids.length?ids.map(id=>{
+    const p=players[id],s=scores[id]&&scores[id].runId===run?scores[id]:null;
+    const sel=tm?`<select data-id="${id}" aria-label="Tim ${esc(p.name)}"><option value="">Tanpa tim</option>${(session.teams||[]).map(t=>`<option value="${t.id}" ${p.teamId===t.id?"selected":""}>${esc(t.name)}</option>`).join("")}</select>`:"";
+    return `<div class="rrow ${tm?"tm":""} ${p.removed?"gone":""}"><span class="nm">${esc(p.name)}</span>${sel}<span class="sc">${s?s.score+" poin":"–"}</span><button class="b sm" data-act="${p.removed?"restore":"rm"}" data-id="${id}">${p.removed?"Pulihkan":"Keluarkan"}</button></div>`;
+  }).join(""):`<p class="note" style="margin:0">Belum ada peserta yang mendaftar. Bagikan tautan halaman ini ke siswa.</p>`;
+  if(h!==rosterHtml){rosterHtml=h;$("roster").innerHTML=h}
+  const st=effStatus();
+  $("tstart").disabled=st==="running";
+  $("tstop").disabled=st!=="running";
+  $("treset").disabled=!session||session.status==="lobby";
+}
+$("roster").addEventListener("click",async e=>{
+  const b=e.target.closest("button[data-act]");if(!b)return;
+  try{await db.doc("players/"+b.dataset.id).update({removed:b.dataset.act==="rm"})}
+  catch(err){tmsg("Gagal mengubah peserta: "+(err&&err.code?err.code:"coba lagi"),false)}
+});
+$("roster").addEventListener("change",async e=>{
+  const s=e.target.closest("select[data-id]");if(!s)return;
+  try{await db.doc("players/"+s.dataset.id).update({teamId:s.value})}
+  catch(err){tmsg("Gagal memindah tim: "+(err&&err.code?err.code:"coba lagi"),false)}
+});
+
+/* ---------- data bersama ---------- */
+function onData(){
+  if(isTeacher&&!formFilled&&session)fillForm();
+  renderBanner();renderJoin();renderRoster();renderBoard();
+}
+async function initLive(){
+  let u=null,d=null;
+  try{if(window.claude&&window.claude.use){u=await window.claude.use("user");d=await window.claude.use("db")}}catch(e){}
+  user=u;db=d;
+  if(u){try{isTeacher=await u.canEdit();uid=await u.id();const me=await u.me();myName=me.name||""}catch(e){}}
+  $("tpanel").hidden=!(isTeacher&&db);
+  renderBanner();
+  if(!db)return;
+  const t=setTimeout(()=>{loadFailed=true;renderBanner()},10000);
+  const ok=()=>{clearTimeout(t);loadFailed=false};
+  const bad=()=>{clearTimeout(t);loadFailed=true;renderBanner()};
+  db.doc("session/current").onSnapshot(s=>{ok();session=s.exists?s.data():null;onData()},bad);
+  db.collection("players").onSnapshot(q=>{ok();players={};q.docs.forEach(x=>{players[x.id]=x.data()});onData()},bad);
+  db.collection("scores").onSnapshot(q=>{ok();scores={};q.docs.forEach(x=>{scores[x.id]=x.data()});onData()},bad);
+}
+
+fillTheme();
+startPractice();
+initLive();
+</script>
+
+</body>
+</html>
