@@ -52,6 +52,9 @@ h3{font-family:var(--font-display);font-size:1.05rem;margin:0}
 .pill.lobby{border-color:var(--accent);color:var(--accent)}
 .clock{font-family:var(--font-display);font-weight:800;font-size:2rem;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.02em}
 .clock.low{color:var(--bad)}
+.kelasbar{display:flex;gap:8px;flex-wrap:wrap}
+.kb{font:inherit;font-weight:600;border-radius:999px;padding:6px 16px;cursor:pointer;border:1.5px solid var(--line);background:var(--surface);color:var(--ink)}
+.kb[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
 .lv{font:inherit;text-align:left;background:var(--surface);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;flex-direction:column;gap:2px;min-width:0}
 .lv .ar{font-family:var(--font-ar);font-size:1.25rem;line-height:1.4}
@@ -115,6 +118,7 @@ fieldset.fld{border:0;padding:0;margin:0}
 .rrow select{grid-column:1/-1;font:inherit;font-size:.9rem;background:var(--bg);color:var(--ink);border:1.5px solid var(--line);border-radius:8px;padding:4px 8px}
 .rrow.tm{grid-template-columns:minmax(0,1fr) auto auto auto}
 .rrow.tm select{grid-column:auto}
+.rbtns{display:flex;gap:6px}
 .board ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
 .board li{display:grid;grid-template-columns:2rem minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 10px;border-radius:10px;border:1.5px solid var(--line)}
 .board li.me{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
@@ -123,8 +127,45 @@ fieldset.fld{border:0;padding:0;margin:0}
 .board .nm small{display:block;color:var(--muted);font-size:.78rem}
 .board .pt{font-family:var(--font-display);font-weight:800;font-size:1.1rem;text-align:right;font-variant-numeric:tabular-nums}
 .board .pt small{display:block;font-family:var(--font-body);font-weight:400;color:var(--muted);font-size:.74rem}
+.hrow{border-bottom:1px solid var(--line);padding:6px 0}
+.hrow>summary{cursor:pointer;font-weight:600;overflow-wrap:anywhere}
+.hrow .hb{display:flex;flex-direction:column;gap:8px;padding:8px 0}
+.hrow table{border-collapse:collapse;width:100%;font-size:.88rem;font-variant-numeric:tabular-nums}
+.hrow th,.hrow td{text-align:left;padding:4px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.hrow th{color:var(--muted);font-weight:600;font-size:.74rem;letter-spacing:.06em;text-transform:uppercase}
 @keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
 @media (prefers-reduced-motion:reduce){.slots.no{animation:none}.bar i{transition:none}}
+.board .hd{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.board .mem{display:block;color:var(--muted);font-size:.78rem;margin-top:2px}
+.board.proj{position:fixed;inset:0;z-index:100;border-radius:0;border:0;padding:max(16px,3vw);overflow:auto;background:var(--bg);gap:3vh}
+.board.proj h3{font-size:clamp(1.6rem,4vw,2.6rem)}
+.board.proj li{padding:clamp(10px,1.8vh,20px) clamp(12px,2vw,28px);font-size:clamp(1.1rem,2.6vw,2rem);border-radius:16px}
+.board.proj .rk{font-size:clamp(1.3rem,3vw,2.4rem)}
+.board.proj .nm small,.board.proj .mem{font-size:clamp(.85rem,1.6vw,1.3rem)}
+.board.proj .pt{font-size:clamp(1.5rem,3.4vw,2.8rem)}
+.board.proj.dense{padding:max(10px,1.6vw);gap:1.6vh}
+.board.proj.dense ol{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.2vh 1.2vw}
+.board.proj.dense h3{font-size:clamp(1.2rem,2.4vw,1.8rem)}
+.board.proj.dense li{padding:clamp(6px,1.2vh,12px) clamp(8px,1.2vw,16px);font-size:clamp(.95rem,1.7vw,1.35rem);gap:clamp(6px,1vw,14px);grid-template-columns:1.6rem minmax(0,1fr) auto}
+.board.proj.dense .rk{font-size:clamp(1rem,1.9vw,1.5rem)}
+.board.proj.dense .nm small,.board.proj.dense .mem{font-size:clamp(.72rem,1.2vw,.95rem)}
+.board.proj.dense .pt{font-size:clamp(1.15rem,2.2vw,1.8rem)}
+.board.proj.dense .pt small{font-size:clamp(.65rem,1vw,.85rem)}
+.board.proj .pt small{font-size:clamp(.8rem,1.4vw,1.1rem)}
+#printarea{display:none}
+@media print{
+ body.printing>*:not(#printarea){display:none!important}
+ body.printing #printarea{display:block!important;color:#000;background:#fff;font:12pt/1.45 "Figtree",system-ui,sans-serif;padding:0}
+ #printarea h1{font-size:18pt;margin:0 0 4pt}
+ #printarea h2{font-size:13pt;margin:14pt 0 4pt}
+ #printarea table{border-collapse:collapse;width:100%;margin:4pt 0 8pt;break-inside:auto}
+ #printarea th,#printarea td{border:1px solid #444;padding:4pt 6pt;text-align:left;vertical-align:top}
+ #printarea th{background:#e8e8e8}
+ #printarea tr{break-inside:avoid}
+ #printarea .rmeta td:first-child{width:32%;font-weight:600}
+ #printarea .sign{margin-top:28pt;display:flex;justify-content:flex-end}
+ #printarea .sign div{width:200pt;text-align:center}
+}
 </style>
 </head>
 <body>
@@ -133,7 +174,7 @@ fieldset.fld{border:0;padding:0;margin:0}
   <header>
     <div>
       <h1>Susun Kalimat Arab</h1>
-      <p class="sub">Bahasa Arab MA Kelas XI · ketuk kata hingga menjadi kalimat yang tepat</p>
+      <p class="sub">Bahasa Arab MA Kelas X, XI, dan XII · ketuk kata hingga menjadi kalimat yang tepat</p>
     </div>
     <div class="score" aria-live="polite"><small>Skor</small><span id="score">0</span></div>
   </header>
@@ -169,12 +210,17 @@ fieldset.fld{border:0;padding:0;margin:0}
       <p class="fb" id="tmsg"></p>
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
         <h3>Peserta (<span id="pcount">0</span>)</h3>
-        <button class="b sm" id="tshuffle" hidden>Bagi tim acak</button>
+        <div class="actions"><button class="b sm" id="tshuffle" hidden>Bagi tim acak</button><button class="b sm warn" id="tclear">Hapus semua peserta</button></div>
       </div>
       <div class="roster" id="roster"></div>
+      <h3>Riwayat hasil</h3>
+      <p class="note" style="margin:0">Hasil tiap sesi tersimpan otomatis beberapa detik setelah sesi selesai, selama halaman guru masih terbuka.</p>
+      <div class="actions"><button class="b sm" id="hall">Unduh semua riwayat (CSV)</button></div>
+      <div class="roster" id="hist"></div>
     </div>
   </details>
 
+  <div class="kelasbar" id="kelasbar" role="group" aria-label="Pilih kelas"></div>
   <div class="levels" id="levels" role="group" aria-label="Pilih tema latihan"></div>
 
   <section class="card" id="card" aria-live="polite"></section>
@@ -193,9 +239,10 @@ fieldset.fld{border:0;padding:0;margin:0}
     </div>
   </details>
 
-  <p class="note">Tema dan kosakata mengikuti topik buku Bahasa Arab MA Kelas XI. Setiap permainan mengacak soal dari bank 15 soal per tema, jadi tiap siswa mendapat soal dan urutan kata yang berbeda. Guru dapat mencocokkan kalimat dengan edisi buku yang dipakai di kelas.</p>
+  <p class="note">Tema dan kosakata mengikuti topik buku Bahasa Arab MA Kelas X, XI, dan XII (Buku Siswa Kemenag terbaru, Kurikulum 2025). Setiap permainan mengacak soal dari bank 25 soal per tema, jadi tiap siswa mendapat soal dan urutan kata yang berbeda. Guru dapat mencocokkan kalimat dengan edisi buku yang dipakai di kelas.</p>
 </div>
 
+<div id="printarea" aria-hidden="true"></div>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
@@ -212,71 +259,338 @@ const FIREBASE_CONFIG={
 </script>
 <script>
 const LEVELS=[
- {ar:"التَّسَوُّقُ",id:"Berbelanja",items:[
-  {w:"ذَهَبَ أَحْمَدُ إِلَى السُّوقِ",x:"مِنَ",m:"Ahmad pergi ke pasar."},
-  {w:"اشْتَرَتْ فَاطِمَةُ ثَوْبًا جَدِيدًا",x:"قَدِيمًا",m:"Fatimah membeli baju baru."},
-  {w:"الْبَائِعُ يَبِيعُ الْفَاكِهَةَ فِي الدُّكَّانِ",x:"عَلَى",m:"Penjual menjual buah di toko."},
-  {w:"كَمْ سِعْرُ هَذَا الْقَمِيصِ؟",x:"مَنْ",m:"Berapa harga kemeja ini?"},
-  {w:"أُرِيدُ أَنْ أَشْتَرِيَ حِذَاءً رَخِيصًا",x:"غَالِيًا",m:"Saya ingin membeli sepatu yang murah."},
-  {w:"زُرْتُ السُّوقَ مَعَ أُمِّي",x:"عَنْ",m:"Saya mengunjungi pasar bersama ibuku."},
-  {w:"هَذَا الْكِتَابُ غَالٍ جِدًّا",x:"رَخِيصٌ",m:"Buku ini sangat mahal."},
-  {w:"اشْتَرَى أَبِي سَيَّارَةً جَدِيدَةً",x:"قَدِيمَةً",m:"Ayahku membeli mobil baru."},
-  {w:"أَيْنَ أَجِدُ الْحَقِيبَةَ؟",x:"مَتَى",m:"Di mana saya menemukan tas?"},
-  {w:"يَدْفَعُ الزَّبُونُ الثَّمَنَ لِلْبَائِعِ",x:"مِنَ",m:"Pembeli membayar harga kepada penjual."},
-  {w:"فِي السُّوقِ خُضَارٌ وَفَاكِهَةٌ",x:"مِنْ",m:"Di pasar ada sayuran dan buah."},
-  {w:"تُحِبُّ أُخْتِي شِرَاءَ الْمَلَابِسِ",x:"تَكْرَهُ",m:"Saudara perempuanku suka membeli pakaian."},
-  {w:"هَلْ عِنْدَكَ قَلَمٌ جَمِيلٌ؟",x:"مَنْ",m:"Apakah kamu punya pena yang bagus?"},
-  {w:"التَّخْفِيضُ كَبِيرٌ فِي الْمَتْجَرِ",x:"عَلَى",m:"Diskonnya besar di toko."},
-  {w:"أَعْطَانِي الْبَائِعُ الْبَاقِيَ",x:"عَنِ",m:"Penjual memberiku uang kembaliannya."}]},
- {ar:"رَأْسُ السَّنَةِ الْهِجْرِيَّةِ",id:"Tahun Baru Hijriah",items:[
-  {w:"هَاجَرَ النَّبِيُّ مِنْ مَكَّةَ إِلَى الْمَدِينَةِ",x:"فِي",m:"Nabi berhijrah dari Makkah ke Madinah."},
-  {w:"تَبْدَأُ السَّنَةُ الْهِجْرِيَّةُ بِشَهْرِ الْمُحَرَّمِ",x:"عَنْ",m:"Tahun Hijriah dimulai dengan bulan Muharram."},
-  {w:"يَحْتَفِلُ الْمُسْلِمُونَ بِرَأْسِ السَّنَةِ الْهِجْرِيَّةِ",x:"مَعَ",m:"Umat Islam memperingati tahun baru Hijriah."},
-  {w:"اتَّخَذَ عُمَرُ الْهِجْرَةَ بِدَايَةً لِلتَّقْوِيمِ",x:"نِهَايَةً",m:"Umar menjadikan hijrah sebagai awal penanggalan."},
-  {w:"نَقْرَأُ الْقُرْآنَ فِي الْمَسْجِدِ",x:"إِلَى",m:"Kami membaca Al-Qur'an di masjid."},
-  {w:"يَقَعُ الْمُحَرَّمُ فِي أَوَّلِ السَّنَةِ الْهِجْرِيَّةِ",x:"آخِرِ",m:"Muharram jatuh di awal tahun Hijriah."},
-  {w:"صَحِبَ أَبُو بَكْرٍ النَّبِيَّ فِي الْهِجْرَةِ",x:"عَنْ",m:"Abu Bakar menemani Nabi dalam hijrah."},
-  {w:"اسْتَقْبَلَ الْأَنْصَارُ الْمُهَاجِرِينَ فِي الْمَدِينَةِ",x:"مِنْ",m:"Kaum Anshar menyambut kaum Muhajirin di Madinah."},
-  {w:"السَّنَةُ الْهِجْرِيَّةُ تَعْتَمِدُ عَلَى الْقَمَرِ",x:"الشَّمْسِ",m:"Tahun Hijriah berdasarkan peredaran bulan."},
-  {w:"نَتَعَلَّمُ مِنَ الْهِجْرَةِ الصَّبْرَ وَالشَّجَاعَةَ",x:"عَنِ",m:"Kita belajar kesabaran dan keberanian dari hijrah."},
-  {w:"يَدْعُو الْمُسْلِمُونَ اللهَ فِي بِدَايَةِ الْعَامِ",x:"نِهَايَةِ",m:"Umat Islam berdoa kepada Allah di awal tahun."},
-  {w:"خَرَجَ النَّبِيُّ لَيْلًا مِنْ مَكَّةَ",x:"نَهَارًا",m:"Nabi keluar dari Makkah pada malam hari."},
-  {w:"عَدَدُ شُهُورِ السَّنَةِ اثْنَا عَشَرَ شَهْرًا",x:"ثَلَاثَةَ",m:"Jumlah bulan dalam setahun ada dua belas."},
-  {w:"أَقَامَ النَّبِيُّ الْمَسْجِدَ فِي الْمَدِينَةِ",x:"هَدَمَ",m:"Nabi mendirikan masjid di Madinah."},
-  {w:"تُذَكِّرُنَا الْهِجْرَةُ بِتَضْحِيَةِ الصَّحَابَةِ",x:"بَيْنَ",m:"Hijrah mengingatkan kita pada pengorbanan para sahabat."}]},
- {ar:"الْأُسْرَةُ وَالسَّكَنُ",id:"Keluarga dan Asrama",items:[
-  {w:"يَنَامُ الطُّلَّابُ فِي الْغُرْفَةِ",x:"مِنَ",m:"Para siswa tidur di kamar."},
-  {w:"تَسْتَيْقِظُ أُسْرَتِي قَبْلَ الْفَجْرِ",x:"بَعْدَ",m:"Keluargaku bangun sebelum subuh."},
-  {w:"أَدْرُسُ مَعَ أَصْدِقَائِي بَعْدَ الْعَصْرِ",x:"قَبْلَ",m:"Saya belajar bersama teman-temanku setelah asar."},
-  {w:"أَبِي مُعَلِّمٌ وَأُمِّي طَبِيبَةٌ",x:"فِي",m:"Ayahku seorang guru dan ibuku seorang dokter."},
-  {w:"نَأْكُلُ الْعَشَاءَ مَعَ الْأُسْرَةِ",x:"عَلَى",m:"Kami makan malam bersama keluarga."},
+ {kelas:10,ar:"التَّعَارُفُ",id:"Perkenalan",items:[
+  {w:"اسْمِي أَحْمَدُ وَأَنَا طَالِبٌ",x:"مِنْ",m:"Namaku Ahmad dan aku seorang siswa."},
+  {w:"مَا اسْمُكَ يَا أَخِي؟",x:"أَيْنَ",m:"Siapa namamu, wahai saudaraku?"},
+  {w:"أَنَا مِنْ إِنْدُونِيسِيَا",x:"فِي",m:"Aku berasal dari Indonesia."},
+  {w:"تَشَرَّفْنَا بِمَعْرِفَتِكَ يَا أَخِي",x:"عَنْ",m:"Senang berkenalan denganmu."},
+  {w:"كَيْفَ حَالُكَ الْيَوْمَ؟",x:"مَنْ",m:"Bagaimana kabarmu hari ini?"},
+  {w:"أَنَا بِخَيْرٍ وَالْحَمْدُ لِلَّهِ",x:"شَرٍّ",m:"Aku baik-baik saja, alhamdulillah."},
+  {w:"أَيْنَ تَسْكُنُ يَا مُحَمَّدُ؟",x:"مَتَى",m:"Di mana kamu tinggal, Muhammad?"},
+  {w:"أَسْكُنُ فِي مَدِينَةِ جَاكَرْتَا",x:"إِلَى",m:"Aku tinggal di kota Jakarta."},
+  {w:"عُمْرِي سِتَّةَ عَشَرَ عَامًا",x:"كَبِيرٌ",m:"Umurku enam belas tahun."},
+  {w:"هَذِهِ صَدِيقَتِي فَاطِمَةُ",x:"هَذَا",m:"Ini temanku, Fatimah."},
+  {w:"هُوَ يَدْرُسُ فِي الصَّفِّ الْعَاشِرِ",x:"مِنَ",m:"Dia belajar di kelas sepuluh."},
+  {w:"السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ",x:"فِي",m:"Semoga keselamatan dan rahmat Allah atas kalian."},
+  {w:"أُحِبُّ اللُّغَةَ الْعَرَبِيَّةَ كَثِيرًا",x:"أَكْرَهُ",m:"Aku sangat suka bahasa Arab."},
+  {w:"مَا جِنْسِيَّتُكَ يَا صَدِيقِي؟",x:"مَتَى",m:"Apa kewarganegaraanmu?"},
+  {w:"أَلْتَقِي بِصَدِيقِي فِي الْمَدْرَسَةِ",x:"عَلَى",m:"Aku bertemu temanku di sekolah."}]},
+ {kelas:10,ar:"الْأُسْرَةُ",id:"Keluarga",items:[
+  {w:"أَبِي مُدَرِّسٌ فِي الْمَدْرَسَةِ",x:"مِنَ",m:"Ayahku guru di sekolah."},
+  {w:"أُمِّي تَطْبُخُ الطَّعَامَ فِي الْبَيْتِ",x:"عَنِ",m:"Ibuku memasak makanan di rumah."},
+  {w:"عِنْدِي أَخٌ كَبِيرٌ وَأُخْتٌ صَغِيرَةٌ",x:"فِي",m:"Aku punya kakak laki-laki dan adik perempuan."},
+  {w:"جَدِّي يُصَلِّي فِي الْمَسْجِدِ",x:"إِلَى",m:"Kakekku shalat di masjid."},
+  {w:"جَدَّتِي تَقْرَأُ الْقُرْآنَ كُلَّ يَوْمٍ",x:"لَيْلَةٍ",m:"Nenekku membaca Al-Qur'an setiap hari."},
   {w:"أُسْرَتِي صَغِيرَةٌ وَسَعِيدَةٌ",x:"كَبِيرَةٌ",m:"Keluargaku kecil dan bahagia."},
-  {w:"يَجْلِسُ الطُّلَّابُ فِي مَكْتَبَةِ السَّكَنِ",x:"تَحْتَ",m:"Para siswa duduk di perpustakaan asrama."},
-  {w:"يُصَلِّي أَخِي الْفَجْرَ فِي الْمَسْجِدِ",x:"عَنْ",m:"Kakakku shalat subuh di masjid."},
-  {w:"تُسَاعِدُ الْبِنْتُ أُمَّهَا فِي الْمَطْبَخِ",x:"مِنْ",m:"Anak perempuan membantu ibunya di dapur."},
-  {w:"مَتَى تَرْجِعُ مِنَ الْمَدْرَسَةِ؟",x:"أَيْنَ",m:"Kapan kamu pulang dari sekolah?"},
-  {w:"فِي غُرْفَتِي سَرِيرٌ وَمَكْتَبٌ",x:"عَنْ",m:"Di kamarku ada tempat tidur dan meja belajar."},
-  {w:"نَغْسِلُ الْمَلَابِسَ يَوْمَ الْجُمُعَةِ",x:"عَنْ",m:"Kami mencuci pakaian pada hari Jumat."},
-  {w:"جَدِّي يَسْكُنُ فِي الْقَرْيَةِ",x:"الْمَدِينَةِ",m:"Kakekku tinggal di desa."},
-  {w:"يَجْتَمِعُ أَفْرَادُ الْأُسْرَةِ فِي الْمَسَاءِ",x:"عَنِ",m:"Anggota keluarga berkumpul pada sore hari."},
-  {w:"نُنَظِّفُ غُرْفَتَنَا كُلَّ صَبَاحٍ",x:"عَلَى",m:"Kami membersihkan kamar kami setiap pagi."}]},
- {ar:"الْأَدْيَانُ فِي إِنْدُونِيسِيَا",id:"Agama di Indonesia",items:[
+  {w:"عَمِّي يَعْمَلُ فِي الشَّرِكَةِ",x:"مَعَ",m:"Pamanku bekerja di perusahaan."},
+  {w:"خَالَتِي تَزُورُنَا فِي الْعِيدِ",x:"مِنْ",m:"Bibiku mengunjungi kami pada hari raya."},
+  {w:"نَأْكُلُ مَعًا عَلَى مَائِدَةٍ وَاحِدَةٍ",x:"عَنْ",m:"Kami makan bersama di satu meja."},
+  {w:"أُحِبُّ أَبِي وَأُمِّي",x:"أَكْرَهُ",m:"Aku mencintai ayah dan ibuku."},
+  {w:"يُسَاعِدُ أَخِي أَبِي فِي الْحَدِيقَةِ",x:"مِنَ",m:"Kakakku membantu ayah di kebun."},
+  {w:"كَمْ فَرْدًا فِي أُسْرَتِكَ؟",x:"مَنْ",m:"Berapa anggota keluargamu?"},
+  {w:"بَيْتُنَا قَرِيبٌ مِنَ الْمَدْرَسَةِ",x:"بَعِيدٌ",m:"Rumah kami dekat dengan sekolah."},
+  {w:"نَحْتَرِمُ الْوَالِدَيْنِ وَنُطِيعُهُمَا",x:"عَلَى",m:"Kami menghormati dan menaati kedua orang tua."},
+  {w:"أَزُورُ أَقَارِبِي فِي الْإِجَازَةِ",x:"عَنْ",m:"Aku mengunjungi kerabatku saat liburan."}]},
+ {kelas:10,ar:"الْمَدْرَسَةُ",id:"Madrasah",items:[
+  {w:"أَذْهَبُ إِلَى الْمَدْرَسَةِ كُلَّ صَبَاحٍ",x:"مِنَ",m:"Aku pergi ke madrasah setiap pagi."},
+  {w:"الْمُدَرِّسُ يَشْرَحُ الدَّرْسَ فِي الْفَصْلِ",x:"عَلَى",m:"Guru menjelaskan pelajaran di kelas."},
+  {w:"الطُّلَّابُ يَكْتُبُونَ فِي الدَّفْتَرِ",x:"عَنِ",m:"Para siswa menulis di buku tulis."},
+  {w:"فِي الْمَكْتَبَةِ كُتُبٌ كَثِيرَةٌ",x:"قَلِيلَةٌ",m:"Di perpustakaan ada banyak buku."},
+  {w:"نُصَلِّي الظُّهْرَ فِي مُصَلَّى الْمَدْرَسَةِ",x:"مِنْ",m:"Kami shalat Zuhur di mushala madrasah."},
+  {w:"مُدِيرُ الْمَدْرَسَةِ يَدْخُلُ الْمَكْتَبَ",x:"يَخْرُجُ",m:"Kepala madrasah masuk ke kantor."},
+  {w:"أَشْتَرِي الْوَجْبَةَ فِي الْمَقْصِفِ",x:"إِلَى",m:"Aku membeli makanan di kantin."},
+  {w:"يَبْدَأُ الدَّرْسُ فِي السَّاعَةِ السَّابِعَةِ",x:"عَنْ",m:"Pelajaran dimulai pada pukul tujuh."},
+  {w:"السَّبُّورَةُ أَمَامَ الطُّلَّابِ",x:"خَلْفَ",m:"Papan tulis ada di depan para siswa."},
+  {w:"أَلْعَبُ مَعَ أَصْدِقَائِي فِي الْمَلْعَبِ",x:"مِنَ",m:"Aku bermain dengan teman-temanku di lapangan."},
+  {w:"الْمُعَلِّمَةُ تُحِبُّ طُلَّابَهَا",x:"تَكْرَهُ",m:"Ibu guru mencintai murid-muridnya."},
+  {w:"نَدْرُسُ اللُّغَةَ الْعَرَبِيَّةَ وَالرِّيَاضِيَّاتِ",x:"فِي",m:"Kami belajar bahasa Arab dan matematika."},
+  {w:"أُنَظِّفُ الْفَصْلَ مَعَ زُمَلَائِي",x:"عَنْ",m:"Aku membersihkan kelas bersama teman-temanku."},
+  {w:"يَرْجِعُ الطُّلَّابُ إِلَى الْبَيْتِ بَعْدَ الظُّهْرِ",x:"قَبْلَ",m:"Para siswa pulang ke rumah setelah Zuhur."},
+  {w:"الِاجْتِهَادُ سَبَبُ النَّجَاحِ",x:"عَلَى",m:"Kerajinan adalah sebab keberhasilan."}]},
+ {kelas:10,ar:"الْهِوَايَاتُ",id:"Hobi",items:[
+  {w:"هِوَايَتِي قِرَاءَةُ الْكُتُبِ",x:"مِنْ",m:"Hobiku membaca buku."},
+  {w:"يُحِبُّ أَخِي لُعْبَةَ كُرَةِ الْقَدَمِ",x:"يَكْرَهُ",m:"Kakakku suka olahraga sepak bola."},
+  {w:"أَرْسُمُ صُورَةً جَمِيلَةً فِي أَوْقَاتِ الْفَرَاغِ",x:"عَنْ",m:"Aku menggambar gambar yang indah di waktu luang."},
+  {w:"هِيَ تَهْوَى السِّبَاحَةَ فِي الْبَحْرِ",x:"مِنَ",m:"Dia menyukai berenang di laut."},
+  {w:"نَسْمَعُ الْقُرْآنَ بِصَوْتٍ جَمِيلٍ",x:"إِلَى",m:"Kami mendengarkan Al-Qur'an dengan suara yang merdu."},
+  {w:"أُمَارِسُ الرِّيَاضَةَ كُلَّ صَبَاحٍ",x:"عَلَى",m:"Aku berolahraga setiap pagi."},
+  {w:"مَا هِوَايَتُكَ الْمُفَضَّلَةُ؟",x:"مَنْ",m:"Apa hobi kesukaanmu?"},
+  {w:"أَزْرَعُ الْأَزْهَارَ فِي الْحَدِيقَةِ",x:"عَنِ",m:"Aku menanam bunga di kebun."},
+  {w:"يَطْبُخُ أَبِي طَعَامًا لَذِيذًا",x:"مِنْ",m:"Ayahku memasak makanan yang lezat."},
+  {w:"أَلْعَبُ كُرَةَ الرِّيشَةِ مَعَ صَدِيقِي",x:"فِي",m:"Aku bermain bulu tangkis dengan temanku."},
+  {w:"تَجْمَعُ أُخْتِي الطَّوَابِعَ الْقَدِيمَةَ",x:"الْجَدِيدَةَ",m:"Adik perempuanku mengoleksi prangko lama."},
+  {w:"نَرْكَبُ الدَّرَّاجَةَ يَوْمَ الْجُمُعَةِ",x:"مِنْ",m:"Kami naik sepeda pada hari Jumat."},
+  {w:"أَكْتُبُ قِصَصًا قَصِيرَةً",x:"طَوِيلَةً",m:"Aku menulis cerita-cerita pendek."},
+  {w:"الْهِوَايَةُ تَمْلَأُ وَقْتَ الْفَرَاغِ",x:"عَلَى",m:"Hobi mengisi waktu luang."},
+  {w:"نَذْهَبُ إِلَى الصَّيْدِ مَعَ الْجِيرَانِ",x:"عَنِ",m:"Kami pergi memancing bersama para tetangga."}]},
+ {kelas:10,ar:"الْمِهَنُ",id:"Profesi",items:[
+  {w:"الطَّبِيبُ يُعَالِجُ الْمَرْضَى فِي الْمُسْتَشْفَى",x:"مِنَ",m:"Dokter mengobati para pasien di rumah sakit."},
+  {w:"الْمُهَنْدِسُ يَبْنِي الْجُسُورَ وَالْبُيُوتَ",x:"عَنِ",m:"Insinyur membangun jembatan dan rumah."},
+  {w:"الْمُزَارِعُ يَعْمَلُ فِي الْحَقْلِ",x:"إِلَى",m:"Petani bekerja di ladang."},
+  {w:"الشُّرْطِيُّ يَحْمِي الْأَمْنَ فِي الْمَدِينَةِ",x:"مِنْ",m:"Polisi menjaga keamanan di kota."},
+  {w:"الطَّيَّارُ يَقُودُ الطَّائِرَةَ",x:"يَأْكُلُ",m:"Pilot mengemudikan pesawat."},
+  {w:"السَّائِقُ يَسُوقُ الْحَافِلَةَ بِحَذَرٍ",x:"فِي",m:"Sopir mengemudikan bus dengan hati-hati."},
+  {w:"التَّاجِرُ يَبِيعُ السِّلَعَ فِي السُّوقِ",x:"عَلَى",m:"Pedagang menjual barang di pasar."},
+  {w:"الْمُمَرِّضَةُ تُسَاعِدُ الطَّبِيبَ",x:"عَنِ",m:"Perawat membantu dokter."},
+  {w:"النَّجَّارُ يَصْنَعُ الْكُرْسِيَّ مِنَ الْخَشَبِ",x:"إِلَى",m:"Tukang kayu membuat kursi dari kayu."},
+  {w:"أُرِيدُ أَنْ أَكُونَ مُعَلِّمًا فِي الْمُسْتَقْبَلِ",x:"مَاضِيًا",m:"Aku ingin menjadi guru di masa depan."},
+  {w:"مَا مِهْنَةُ أَبِيكَ؟",x:"مَنْ",m:"Apa pekerjaan ayahmu?"},
+  {w:"الْخَبَّازُ يَخْبِزُ الْخُبْزَ كُلَّ صَبَاحٍ",x:"مِنَ",m:"Tukang roti memanggang roti setiap pagi."},
+  {w:"الصَّحَفِيُّ يَكْتُبُ الْأَخْبَارَ",x:"يَقْرَأُ",m:"Wartawan menulis berita."},
+  {w:"الْخَيَّاطُ يُفَصِّلُ الثِّيَابَ",x:"فِي",m:"Penjahit menjahit pakaian."},
+  {w:"الْعَمَلُ الشَّرِيفُ عِبَادَةٌ",x:"عَنْ",m:"Pekerjaan yang mulia adalah ibadah."}]},
+ {kelas:11,ar:"السِّيَاحَةُ",id:"Wisata",items:[
+  {w:"السِّيَاحَةُ تُوَسِّعُ مَعْرِفَةَ الْإِنْسَانِ",x:"عَنْ",m:"Wisata memperluas pengetahuan manusia."},
+  {w:"سَافَرَتْ أُسْرَتِي إِلَى جَزِيرَةِ بَالِي",x:"مِنْ",m:"Keluargaku bepergian ke Pulau Bali."},
+  {w:"اشْتَرَيْتُ تَذْكِرَةَ الْقِطَارِ أَمْسِ",x:"غَدًا",m:"Aku membeli tiket kereta kemarin."},
+  {w:"يَزُورُ السُّيَّاحُ الْأَمَاكِنَ الْأَثَرِيَّةَ",x:"فِي",m:"Para wisatawan mengunjungi tempat-tempat bersejarah."},
+  {w:"كَانَتِ الرِّحْلَةُ مُمْتِعَةً جِدًّا",x:"عَلَى",m:"Perjalanan itu sangat menyenangkan."},
+  {w:"نَزَلْنَا فِي فُنْدُقٍ قَرِيبٍ مِنَ الشَّاطِئِ",x:"بَعِيدٍ",m:"Kami menginap di hotel dekat pantai."},
+  {w:"أَخَذْتُ صُوَرًا جَمِيلَةً لِلْجِبَالِ",x:"عَنِ",m:"Aku mengambil foto-foto indah gunung-gunung."},
+  {w:"رَكِبْنَا الطَّائِرَةَ مِنْ جَاكَرْتَا إِلَى مَكَّةَ",x:"فِي",m:"Kami naik pesawat dari Jakarta ke Makkah."},
+  {w:"الدَّلِيلُ السِّيَاحِيُّ يَشْرَحُ تَارِيخَ الْمَكَانِ",x:"مَعَ",m:"Pemandu wisata menjelaskan sejarah tempat itu."},
+  {w:"أُحِبُّ السَّفَرَ إِلَى الْبِلَادِ الْجَدِيدَةِ",x:"أَكْرَهُ",m:"Aku suka bepergian ke negeri-negeri baru."},
+  {w:"تُعَدُّ إِنْدُونِيسِيَا بَلَدًا سِيَاحِيًّا جَمِيلًا",x:"مِنْ",m:"Indonesia dianggap negeri wisata yang indah."},
+  {w:"حَجَزْنَا الْغُرْفَةَ قَبْلَ الرِّحْلَةِ",x:"بَعْدَ",m:"Kami memesan kamar sebelum perjalanan."},
+  {w:"يَسْتَمْتِعُ السَّائِحُ بِمَنَاظِرِ الطَّبِيعَةِ",x:"إِلَى",m:"Wisatawan menikmati pemandangan alam."},
+  {w:"حَمَلْتُ الْحَقِيبَةَ إِلَى مَحَطَّةِ الْحَافِلَاتِ",x:"عَنْ",m:"Aku membawa tas ke terminal bus."},
+  {w:"الْمُحَافَظَةُ عَلَى نَظَافَةِ الْمَكَانِ السِّيَاحِيِّ وَاجِبَةٌ",x:"فِي",m:"Menjaga kebersihan tempat wisata itu wajib."}]},
+ {kelas:11,ar:"الصِّحَّةُ",id:"Kesehatan",items:[
+  {w:"الصِّحَّةُ تَاجٌ عَلَى رُؤُوسِ الْأَصِحَّاءِ",x:"مِنْ",m:"Kesehatan adalah mahkota di kepala orang yang sehat."},
+  {w:"نَأْكُلُ الطَّعَامَ الصِّحِّيَّ كُلَّ يَوْمٍ",x:"الضَّارَّ",m:"Kami makan makanan sehat setiap hari."},
+  {w:"الرِّيَاضَةُ تُقَوِّي الْجِسْمَ",x:"فِي",m:"Olahraga menguatkan tubuh."},
+  {w:"يَجِبُ أَنْ نَشْرَبَ الْمَاءَ الْكَافِيَ",x:"عَنْ",m:"Kita harus minum air yang cukup."},
+  {w:"ذَهَبْتُ إِلَى الطَّبِيبِ لِأَنِّي مَرِيضٌ",x:"مِنَ",m:"Aku pergi ke dokter karena aku sakit."},
+  {w:"كَتَبَ الطَّبِيبُ لِي وَصْفَةً طِبِّيَّةً",x:"عَلَى",m:"Dokter menuliskan resep obat untukku."},
+  {w:"أَشْعُرُ بِصُدَاعٍ فِي رَأْسِي",x:"عَنْ",m:"Aku merasa pusing di kepalaku."},
+  {w:"تَنَاوَلْتُ الدَّوَاءَ بَعْدَ الْأَكْلِ",x:"قَبْلَ",m:"Aku meminum obat setelah makan."},
+  {w:"النَّوْمُ الْكَافِي يُحَافِظُ عَلَى الصِّحَّةِ",x:"مِنَ",m:"Tidur yang cukup menjaga kesehatan."},
+  {w:"نَغْسِلُ أَيْدِيَنَا قَبْلَ الْأَكْلِ",x:"بَعْدَ",m:"Kami mencuci tangan sebelum makan."},
+  {w:"الْفَوَاكِهُ وَالْخُضَارُ غَنِيَّةٌ بِالْفِيتَامِينَاتِ",x:"فِي",m:"Buah dan sayur kaya akan vitamin."},
+  {w:"التَّدْخِينُ ضَارٌّ بِالصِّحَّةِ",x:"نَافِعٌ",m:"Merokok membahayakan kesehatan."},
+  {w:"النَّظَافَةُ مِنَ الْإِيمَانِ",x:"عَنِ",m:"Kebersihan itu sebagian dari iman."},
+  {w:"زُرْتُ صَدِيقِي الْمَرِيضَ فِي الْمُسْتَشْفَى",x:"إِلَى",m:"Aku menjenguk temanku yang sakit di rumah sakit."},
+  {w:"الْوِقَايَةُ خَيْرٌ مِنَ الْعِلَاجِ",x:"عَلَى",m:"Mencegah lebih baik daripada mengobati."}]},
+ {kelas:11,ar:"الْحَجُّ وَالْعُمْرَةُ",id:"Haji dan Umrah",items:[
+  {w:"الْحَجُّ رُكْنٌ مِنْ أَرْكَانِ الْإِسْلَامِ",x:"عَنْ",m:"Haji adalah salah satu rukun Islam."},
+  {w:"يَذْهَبُ الْحُجَّاجُ إِلَى مَكَّةَ الْمُكَرَّمَةِ",x:"مِنْ",m:"Para jamaah haji pergi ke Makkah Al-Mukarramah."},
+  {w:"نَلْبَسُ ثِيَابَ الْإِحْرَامِ عِنْدَ الْمِيقَاتِ",x:"فِي",m:"Kami memakai pakaian ihram di miqat."},
+  {w:"يَطُوفُ الْحُجَّاجُ حَوْلَ الْكَعْبَةِ سَبْعَةَ أَشْوَاطٍ",x:"عَلَى",m:"Para jamaah thawaf mengelilingi Ka'bah tujuh putaran."},
+  {w:"نَسْعَى بَيْنَ الصَّفَا وَالْمَرْوَةِ",x:"مِنَ",m:"Kami sai antara Shafa dan Marwah."},
+  {w:"يَقِفُ الْحَجِيجُ فِي عَرَفَةَ يَوْمَ التَّاسِعِ",x:"إِلَى",m:"Para jamaah wukuf di Arafah pada hari kesembilan."},
+  {w:"نَرْمِي الْجَمَرَاتِ فِي مِنًى",x:"عَنْ",m:"Kami melempar jumrah di Mina."},
+  {w:"الْعُمْرَةُ تُسَمَّى الْحَجَّ الْأَصْغَرَ",x:"الْأَكْبَرَ",m:"Umrah disebut haji kecil."},
+  {w:"يَحْلِقُ الْحَاجُّ رَأْسَهُ عِنْدَ التَّحَلُّلِ",x:"مِنْ",m:"Jamaah haji mencukur kepalanya saat tahallul."},
+  {w:"نَشْرَبُ مِنْ مَاءِ زَمْزَمَ",x:"فِي",m:"Kami minum dari air zamzam."},
+  {w:"نُلَبِّي بِقَوْلِنَا لَبَّيْكَ اللَّهُمَّ لَبَّيْكَ",x:"عَنْ",m:"Kami bertalbiyah dengan ucapan: Labbaika Allahumma labbaik."},
+  {w:"يُصَلِّي الْمُسْلِمُونَ فِي الْمَسْجِدِ الْحَرَامِ",x:"إِلَى",m:"Umat Islam shalat di Masjidil Haram."},
+  {w:"زَارَ الْحُجَّاجُ الْمَدِينَةَ الْمُنَوَّرَةَ بَعْدَ الْحَجِّ",x:"قَبْلَ",m:"Para jamaah haji berziarah ke Madinah setelah haji."},
+  {w:"الْحَجُّ الْمَبْرُورُ جَزَاؤُهُ الْجَنَّةُ",x:"مِنَ",m:"Haji mabrur balasannya surga."},
+  {w:"يَجِبُ الْحَجُّ عَلَى مَنِ اسْتَطَاعَ",x:"عَنْ",m:"Haji wajib bagi yang mampu."}]},
+ {kelas:11,ar:"الْأَدْيَانُ فِي إِنْدُونِيسِيَا",id:"Agama-agama di Indonesia",items:[
   {w:"فِي إِنْدُونِيسِيَا أَدْيَانٌ كَثِيرَةٌ",x:"مِنْ",m:"Di Indonesia ada banyak agama."},
-  {w:"يُحِبُّ الشَّعْبُ التَّسَامُحَ بَيْنَ الْأَدْيَانِ",x:"عَلَى",m:"Rakyat menyukai toleransi antar agama."},
-  {w:"يَعِيشُ الْمُسْلِمُونَ مَعَ أَتْبَاعِ الْأَدْيَانِ الْأُخْرَى بِسَلَامٍ",x:"ضِدَّ",m:"Umat Islam hidup damai bersama pemeluk agama lain."},
-  {w:"نَحْتَرِمُ عِبَادَةَ الْآخَرِينَ",x:"نَكْرَهُ",m:"Kami menghormati ibadah orang lain."},
-  {w:"التَّسَامُحُ يَجْمَعُ الشَّعْبَ",x:"يُفَرِّقُ",m:"Toleransi mempersatukan rakyat."},
-  {w:"الْمُسْلِمُونَ وَالْمَسِيحِيُّونَ جِيرَانٌ",x:"أَعْدَاءٌ",m:"Umat Islam dan Kristen bertetangga."},
-  {w:"تَحْمِي الدَّوْلَةُ حُرِّيَّةَ الْعِبَادَةِ",x:"عَنْ",m:"Negara melindungi kebebasan beribadah."},
-  {w:"يَعِيشُ الْهِنْدُوسُ فِي جَزِيرَةِ بَالِي",x:"مِنْ",m:"Pemeluk Hindu tinggal di pulau Bali."},
-  {w:"بُورُوبُودُورُ مَعْبَدٌ بُوذِيٌّ قَدِيمٌ",x:"حَدِيثٌ",m:"Borobudur adalah candi Buddha yang kuno."},
-  {w:"نَزُورُ جِيرَانَنَا فِي الْأَعْيَادِ",x:"عَنْ",m:"Kami mengunjungi tetangga pada hari raya."},
-  {w:"الْحِوَارُ بَيْنَ الْأَدْيَانِ يَزِيدُ الْمَحَبَّةَ",x:"يُقَلِّلُ",m:"Dialog antar agama menambah kasih sayang."},
-  {w:"الشِّعَارُ الْوَطَنِيُّ هُوَ الْوَحْدَةُ فِي التَّنَوُّعِ",x:"مِنَ",m:"Semboyan nasional adalah persatuan dalam keberagaman."},
-  {w:"لِكُلِّ إِنْسَانٍ حَقٌّ فِي اخْتِيَارِ دِينِهِ",x:"عَنْ",m:"Setiap orang berhak memilih agamanya."},
-  {w:"نَتَعَاوَنُ مَعَ الْجَمِيعِ لِبِنَاءِ الْوَطَنِ",x:"ضِدَّ",m:"Kita bekerja sama dengan semua orang membangun tanah air."},
-  {w:"السَّلَامُ أَسَاسُ الْحَيَاةِ الْمُشْتَرَكَةِ",x:"الْحَرْبُ",m:"Perdamaian adalah dasar kehidupan bersama."}]}
+  {w:"أَكْثَرُ سُكَّانِ إِنْدُونِيسِيَا مُسْلِمُونَ",x:"عَنْ",m:"Sebagian besar penduduk Indonesia adalah Muslim."},
+  {w:"يَعْبُدُ الْمُسْلِمُونَ اللَّهَ فِي الْمَسْجِدِ",x:"إِلَى",m:"Umat Islam menyembah Allah di masjid."},
+  {w:"يَذْهَبُ الْمَسِيحِيُّونَ إِلَى الْكَنِيسَةِ يَوْمَ الْأَحَدِ",x:"مِنَ",m:"Umat Kristen pergi ke gereja pada hari Ahad."},
+  {w:"يَعْبُدُ الْهِنْدُوسُ فِي الْمَعْبَدِ",x:"عَلَى",m:"Umat Hindu beribadah di pura."},
+  {w:"يُصَلِّي الْبُوذِيُّونَ فِي الْفِيهَارَا",x:"عَلَى",m:"Umat Buddha beribadah di vihara."},
+  {w:"نَحْتَرِمُ أَتْبَاعَ الْأَدْيَانِ الْأُخْرَى",x:"عَلَى",m:"Kami menghormati penganut agama lain."},
+  {w:"التَّسَامُحُ بَيْنَ الْأَدْيَانِ ضَرُورِيٌّ",x:"فِي",m:"Toleransi antar agama itu penting."},
+  {w:"لَكُمْ دِينُكُمْ وَلِيَ دِينِ",x:"مِنْ",m:"Untukmu agamamu dan untukku agamaku."},
+  {w:"نَعِيشُ مَعًا فِي سَلَامٍ وَوِئَامٍ",x:"عَنْ",m:"Kami hidup bersama dalam damai dan rukun."},
+  {w:"شِعَارُنَا الْوَطَنِيُّ التَّنَوُّعُ فِي الْوَحْدَةِ",x:"مِنَ",m:"Semboyan nasional kami Bhinneka Tunggal Ika."},
+  {w:"تَحْتَفِلُ كُلُّ أُمَّةٍ بِأَعْيَادِهَا الدِّينِيَّةِ",x:"فِي",m:"Setiap umat merayakan hari raya agamanya."},
+  {w:"نُسَاعِدُ جِيرَانَنَا مِنْ كُلِّ دِينٍ",x:"عَلَى",m:"Kami membantu tetangga dari setiap agama."},
+  {w:"الْحُرِّيَّةُ الدِّينِيَّةُ مَكْفُولَةٌ فِي الدُّسْتُورِ",x:"عَنِ",m:"Kebebasan beragama dijamin dalam konstitusi."},
+  {w:"الْإِسْلَامُ دِينُ الرَّحْمَةِ وَالسَّلَامِ",x:"مِنْ",m:"Islam adalah agama kasih sayang dan perdamaian."}]},
+ {kelas:12,ar:"تِكْنُولُوجِيَا الْمَعْلُومَاتِ وَالِاتِّصَالِ",id:"Teknologi Informasi dan Komunikasi",items:[
+  {w:"تُسَهِّلُ التِّكْنُولُوجِيَا الِاتِّصَالَ بَيْنَ النَّاسِ",x:"عَنْ",m:"Teknologi memudahkan komunikasi antar manusia."},
+  {w:"أَسْتَخْدِمُ الْهَاتِفَ الذَّكِيَّ كُلَّ يَوْمٍ",x:"إِلَى",m:"Aku menggunakan telepon pintar setiap hari."},
+  {w:"يَبْحَثُ الطُّلَّابُ عَنِ الْمَعْلُومَاتِ فِي الْإِنْتَرْنِتِ",x:"مِنَ",m:"Para siswa mencari informasi di internet."},
+  {w:"أُرْسِلُ رِسَالَةً إِلَكْتُرُونِيَّةً إِلَى مُدَرِّسِي",x:"عَلَى",m:"Aku mengirim surel kepada guruku."},
+  {w:"وَسَائِلُ التَّوَاصُلِ الِاجْتِمَاعِيِّ مُفِيدَةٌ وَخَطِيرَةٌ",x:"فِي",m:"Media sosial itu bermanfaat sekaligus berbahaya."},
+  {w:"يَجِبُ أَنْ نَتَحَقَّقَ مِنَ الْأَخْبَارِ قَبْلَ نَشْرِهَا",x:"بَعْدَ",m:"Kita harus memeriksa berita sebelum menyebarkannya."},
+  {w:"نَتَعَلَّمُ عَبْرَ الْإِنْتَرْنِتِ فِي زَمَنِ الْأَوْبِئَةِ",x:"عَنْ",m:"Kami belajar lewat internet pada masa wabah."},
+  {w:"الْحَاسُوبُ جِهَازٌ يُعَالِجُ الْبَيَانَاتِ",x:"عَلَى",m:"Komputer adalah perangkat yang mengolah data."},
+  {w:"لَا تَنْشُرِ الْأَخْبَارَ الْكَاذِبَةَ",x:"مِنْ",m:"Janganlah menyebarkan berita bohong."},
+  {w:"تُسَاعِدُنَا مَوَاقِعُ الْجَامِعَاتِ عَلَى التَّسْجِيلِ",x:"عَنِ",m:"Situs web universitas membantu kami mendaftar."},
+  {w:"الذَّكَاءُ الِاصْطِنَاعِيُّ يُغَيِّرُ حَيَاةَ النَّاسِ",x:"مِنْ",m:"Kecerdasan buatan mengubah kehidupan manusia."},
+  {w:"نَحْمِي بَيَانَاتِنَا الشَّخْصِيَّةَ بِكَلِمَةِ مُرُورٍ قَوِيَّةٍ",x:"فِي",m:"Kami melindungi data pribadi dengan kata sandi yang kuat."},
+  {w:"شَاهَدْتُ مُحَاضَرَةً مُبَاشِرَةً عَلَى الشَّبَكَةِ",x:"إِلَى",m:"Aku menonton kuliah langsung di jaringan."},
+  {w:"التِّكْنُولُوجِيَا سِلَاحٌ ذُو حَدَّيْنِ",x:"عَنْ",m:"Teknologi adalah pedang bermata dua."},
+  {w:"نَسْتَعْمِلُ التِّكْنُولُوجِيَا فِي خِدْمَةِ الْخَيْرِ",x:"عَلَى",m:"Kami memakai teknologi untuk melayani kebaikan."},
+  {w:"قَلَّلْتُ الْوَقْتَ الَّذِي أَقْضِيهِ أَمَامَ الشَّاشَةِ",x:"زِدْتُ",m:"Aku mengurangi waktu yang kuhabiskan di depan layar."},
+  {w:"يَتَوَاصَلُ الْأَصْدِقَاءُ عَبْرَ تَطْبِيقَاتِ الْمُحَادَثَةِ",x:"مِنْ",m:"Teman-teman berkomunikasi lewat aplikasi pesan."},
+  {w:"الْإِعْلَامُ الرَّقْمِيُّ يَنْقُلُ الْخَبَرَ بِسُرْعَةٍ",x:"عَنْ",m:"Media digital menyampaikan berita dengan cepat."},
+  {w:"عَلَيْنَا أَنْ نَسْتَعْمِلَ الْإِنْتَرْنِتَ بِحِكْمَةٍ",x:"مِنْ",m:"Kita harus memakai internet dengan bijak."},
+  {w:"الْعِلْمُ النَّافِعُ يَرْفَعُ شَأْنَ الْأُمَّةِ",x:"فِي",m:"Ilmu yang bermanfaat mengangkat derajat umat."}]},
+ {kelas:12,ar:"عُظَمَاءُ الْإِسْلَامِ",id:"Tokoh-tokoh Islam",items:[
+  {w:"مُحَمَّدٌ رَسُولُ اللَّهِ وَخَاتَمُ الْأَنْبِيَاءِ",x:"مِنْ",m:"Muhammad adalah utusan Allah dan penutup para nabi."},
+  {w:"كَانَ أَبُو بَكْرٍ أَوَّلَ الْخُلَفَاءِ الرَّاشِدِينَ",x:"آخِرَ",m:"Abu Bakar adalah khalifah pertama dari Khulafaur Rasyidin."},
+  {w:"اشْتَهَرَ عُمَرُ بْنُ الْخَطَّابِ بِالْعَدْلِ",x:"عَنِ",m:"Umar bin Khattab terkenal dengan keadilannya."},
+  {w:"كَانَ عُثْمَانُ بْنُ عَفَّانَ كَرِيمًا وَحَيِيًّا",x:"بَخِيلًا",m:"Utsman bin Affan adalah seorang yang dermawan dan pemalu."},
+  {w:"كَانَ عَلِيُّ بْنُ أَبِي طَالِبٍ بَابَ مَدِينَةِ الْعِلْمِ",x:"فِي",m:"Ali bin Abi Thalib adalah pintu kota ilmu."},
+  {w:"فَتَحَ صَلَاحُ الدِّينِ الْأَيُّوبِيُّ بَيْتَ الْمَقْدِسِ",x:"مِنْ",m:"Shalahuddin Al-Ayyubi membebaskan Baitul Maqdis."},
+  {w:"أَلَّفَ ابْنُ سِينَا كِتَابَ الْقَانُونِ فِي الطِّبِّ",x:"عَنِ",m:"Ibnu Sina menulis kitab Al-Qanun dalam bidang kedokteran."},
+  {w:"كَانَ الْإِمَامُ الشَّافِعِيُّ عَالِمًا كَبِيرًا",x:"عَلَى",m:"Imam Syafi'i adalah seorang ulama besar."},
+  {w:"كَتَبَ ابْنُ خَلْدُونَ الْمُقَدِّمَةَ فِي عِلْمِ الِاجْتِمَاعِ",x:"إِلَى",m:"Ibnu Khaldun menulis Al-Muqaddimah dalam ilmu sosial."},
+  {w:"وَضَعَ الْخَوَارِزْمِيُّ أُسُسَ عِلْمِ الْجَبْرِ",x:"مِنْ",m:"Al-Khawarizmi meletakkan dasar-dasar ilmu aljabar."},
+  {w:"تَرَكَ الْعُلَمَاءُ الْمُسْلِمُونَ كُتُبًا نَافِعَةً",x:"عَلَى",m:"Para ulama Muslim meninggalkan buku-buku yang bermanfaat."},
+  {w:"كَانَتْ خَدِيجَةُ أُمَّ الْمُؤْمِنِينَ الْأُولَى",x:"مِنَ",m:"Khadijah adalah Ibunda kaum mukminin yang pertama."},
+  {w:"اجْتَهَدَ الْإِمَامُ الْغَزَالِيُّ فِي طَلَبِ الْعِلْمِ",x:"عَنْ",m:"Imam Al-Ghazali bersungguh-sungguh dalam menuntut ilmu."},
+  {w:"نَقْتَدِي بِأَخْلَاقِ الرَّسُولِ فِي حَيَاتِنَا",x:"عَلَى",m:"Kami meneladani akhlak Rasul dalam kehidupan kami."},
+  {w:"نَشَرَ الْمُسْلِمُونَ الْعِلْمَ فِي الْأَنْدَلُسِ",x:"إِلَى",m:"Kaum Muslimin menyebarkan ilmu di Andalusia."},
+  {w:"عُمَرُ بْنُ عَبْدِ الْعَزِيزِ خَلِيفَةٌ عَادِلٌ",x:"مِنْ",m:"Umar bin Abdul Aziz adalah khalifah yang adil."},
+  {w:"كَانَ بِلَالٌ أَوَّلَ مُؤَذِّنٍ فِي الْإِسْلَامِ",x:"عَنْ",m:"Bilal adalah muazin pertama dalam Islam."},
+  {w:"اشْتَهَرَ مُحَمَّدٌ الْفَاتِحُ بِفَتْحِ الْقُسْطَنْطِينِيَّةِ",x:"فِي",m:"Muhammad Al-Fatih terkenal karena menaklukkan Konstantinopel."},
+  {w:"أَسَّسَتْ فَاطِمَةُ الْفِهْرِيَّةُ جَامِعَةَ الْقَرَوِيِّينَ",x:"مِنْ",m:"Fatimah Al-Fihri mendirikan Universitas Al-Qarawiyyin."},
+  {w:"الْقُدْوَةُ الْحَسَنَةُ تَبْنِي الْأُمَّةَ",x:"عَلَى",m:"Teladan yang baik membangun umat."}]},
+ {kelas:12,ar:"الدِّرَاسَةُ فِي الْجَامِعَةِ",id:"Kuliah di Universitas",items:[
+  {w:"أُرِيدُ أَنْ أَدْرُسَ فِي الْجَامِعَةِ",x:"مِنَ",m:"Aku ingin kuliah di universitas."},
+  {w:"سَأَلْتَحِقُ بِكُلِّيَّةِ الشَّرِيعَةِ بَعْدَ التَّخَرُّجِ",x:"قَبْلَ",m:"Aku akan masuk Fakultas Syariah setelah lulus."},
+  {w:"تَقَدَّمْتُ بِطَلَبِ الْقَبُولِ إِلَى الْجَامِعَةِ",x:"عَنْ",m:"Aku mengajukan permohonan pendaftaran ke universitas."},
+  {w:"نَجَحْتُ فِي اخْتِبَارِ الْقَبُولِ",x:"رَسَبْتُ",m:"Aku lulus dalam tes penerimaan."},
+  {w:"حَصَلْتُ عَلَى مِنْحَةٍ دِرَاسِيَّةٍ",x:"مِنْ",m:"Aku mendapatkan beasiswa."},
+  {w:"يَدْرُسُ الطُّلَّابُ فِي قِسْمِ اللُّغَةِ الْعَرَبِيَّةِ",x:"عَلَى",m:"Para mahasiswa belajar di jurusan bahasa Arab."},
+  {w:"يُحَاضِرُ الْأُسْتَاذُ فِي قَاعَةِ الْمُحَاضَرَاتِ",x:"إِلَى",m:"Dosen memberi kuliah di ruang kuliah."},
+  {w:"أَسْتَعِيرُ الْكُتُبَ مِنْ مَكْتَبَةِ الْجَامِعَةِ",x:"عَنْ",m:"Aku meminjam buku dari perpustakaan universitas."},
+  {w:"كَتَبَ الطَّالِبُ بَحْثًا عِلْمِيًّا قَصِيرًا",x:"عَلَى",m:"Mahasiswa menulis penelitian ilmiah singkat."},
+  {w:"سَكَنْتُ فِي سَكَنِ الطُّلَّابِ قُرْبَ الْكُلِّيَّةِ",x:"بُعْدَ",m:"Aku tinggal di asrama mahasiswa dekat fakultas."},
+  {w:"يَحْصُلُ الطَّالِبُ عَلَى شَهَادَةِ الْبَكَالُورْيُوسِ بَعْدَ أَرْبَعِ سَنَوَاتٍ",x:"مِنْ",m:"Mahasiswa memperoleh ijazah sarjana setelah empat tahun."},
+  {w:"أُشَارِكُ فِي الْأَنْشِطَةِ الطُّلَّابِيَّةِ",x:"عَنِ",m:"Aku ikut serta dalam kegiatan kemahasiswaan."},
+  {w:"أَخْتَارُ التَّخَصُّصَ الَّذِي يُنَاسِبُ مَوْهِبَتِي",x:"فِي",m:"Aku memilih jurusan yang sesuai bakatku."},
+  {w:"يُنَاقِشُ الطَّالِبُ رِسَالَتَهُ أَمَامَ اللَّجْنَةِ",x:"خَلْفَ",m:"Mahasiswa mempertahankan skripsinya di hadapan penguji."},
+  {w:"أَطْلُبُ الْعِلْمَ لِخِدْمَةِ الْوَطَنِ وَالدِّينِ",x:"مِنْ",m:"Aku menuntut ilmu untuk mengabdi pada bangsa dan agama."},
+  {w:"الدِّرَاسَةُ الْجَامِعِيَّةُ تَحْتَاجُ إِلَى الصَّبْرِ وَالْجِدِّ",x:"عَنِ",m:"Kuliah membutuhkan kesabaran dan kesungguhan."},
+  {w:"يَتَخَرَّجُ الطُّلَّابُ فِي حَفْلٍ كَبِيرٍ",x:"إِلَى",m:"Para mahasiswa diwisuda dalam acara besar."},
+  {w:"أُرِيدُ أَنْ أَدْرُسَ فِي جَامِعَةِ الْأَزْهَرِ",x:"عَلَى",m:"Aku ingin belajar di Universitas Al-Azhar."},
+  {w:"التَّعَلُّمُ مَدَى الْحَيَاةِ طَرِيقُ النَّجَاحِ",x:"فِي",m:"Belajar sepanjang hayat adalah jalan sukses."},
+  {w:"اسْأَلِ الْمُشْرِفَ عَنْ خُطَّةِ الْبَحْثِ",x:"مِنَ",m:"Tanyakan kepada pembimbing tentang rencana penelitian."}]},
 ];
+const EXTRA={
+"Perkenalan":[
+ {w:"أَنَا سَعِيدٌ بِلِقَائِكَ الْيَوْمَ",x:"حَزِينٌ",m:"Aku senang bertemu denganmu hari ini."},
+ {w:"هَلْ أَنْتَ طَالِبٌ جَدِيدٌ؟",x:"مَنْ",m:"Apakah kamu siswa baru?"},
+ {w:"اسْمُ صَدِيقِي يُوسُفُ",x:"فِي",m:"Nama temanku Yusuf."},
+ {w:"وُلِدْتُ فِي مَدِينَةِ سُورَابَايَا",x:"إِلَى",m:"Aku lahir di kota Surabaya."},
+ {w:"هِيَ مُدَرِّسَةُ اللُّغَةِ الْعَرَبِيَّةِ",x:"عَنْ",m:"Dia guru bahasa Arab."},
+ {w:"مَا رَقْمُ هَاتِفِكَ؟",x:"مَتَى",m:"Berapa nomor teleponmu?"},
+ {w:"نَحْنُ زُمَلَاءُ فِي الْفَصْلِ",x:"مِنَ",m:"Kami teman sekelas."},
+ {w:"أَهْلًا وَسَهْلًا بِكُمْ فِي مَدْرَسَتِنَا",x:"عَنْ",m:"Selamat datang di madrasah kami."},
+ {w:"إِلَى اللِّقَاءِ يَا أَصْدِقَائِي",x:"مِنَ",m:"Sampai jumpa, teman-temanku."},
+ {w:"مَعَ السَّلَامَةِ وَشُكْرًا جَزِيلًا",x:"عَلَى",m:"Selamat jalan dan terima kasih banyak."}],
+"Keluarga":[
+ {w:"أَخِي الصَّغِيرُ يَلْعَبُ فِي الْحَدِيقَةِ",x:"الْكَبِيرُ",m:"Adik laki-lakiku bermain di kebun."},
+ {w:"تَسْكُنُ جَدَّتِي مَعَنَا فِي الْبَيْتِ",x:"عَنَّا",m:"Nenekku tinggal bersama kami di rumah."},
+ {w:"أَبِي يَرْجِعُ مِنَ الْعَمَلِ مَسَاءً",x:"إِلَى",m:"Ayahku pulang dari kerja pada sore hari."},
+ {w:"تُرَتِّبُ أُمِّي غُرْفَةَ الْجُلُوسِ",x:"عَلَى",m:"Ibuku merapikan ruang tamu."},
+ {w:"زَوْجَةُ عَمِّي طَبِيبَةٌ",x:"مِنْ",m:"Istri pamanku seorang dokter."},
+ {w:"أَوْلَادُ خَالِي يَزُورُونَنَا كَثِيرًا",x:"قَلِيلًا",m:"Anak-anak pamanku (dari ibu) sering mengunjungi kami."},
+ {w:"نَجْتَمِعُ فِي الْعِيدِ مَعَ الْأَقَارِبِ",x:"عَنِ",m:"Kami berkumpul saat hari raya bersama kerabat."},
+ {w:"الْأُسْرَةُ نَوَاةُ الْمُجْتَمَعِ",x:"فِي",m:"Keluarga adalah inti masyarakat."},
+ {w:"أُنَادِي أُمِّي بِكَلِمَةِ مَامَا",x:"إِلَى",m:"Aku memanggil ibuku dengan kata mama."},
+ {w:"تَعَاوَنَّا فِي أَعْمَالِ الْبَيْتِ",x:"مِنْ",m:"Kami bekerja sama dalam pekerjaan rumah."}],
+"Madrasah":[
+ {w:"يَدْخُلُ الْمُدَرِّسُ الْفَصْلَ بَعْدَ الْجَرَسِ",x:"قَبْلَ",m:"Guru masuk kelas setelah bel."},
+ {w:"أَحْمِلُ الْحَقِيبَةَ وَالْكُتُبَ إِلَى الْمَدْرَسَةِ",x:"مِنَ",m:"Aku membawa tas dan buku ke madrasah."},
+ {w:"الْمُعَلِّمُ يَكْتُبُ الدَّرْسَ عَلَى السَّبُّورَةِ",x:"عَنِ",m:"Guru menulis pelajaran di papan tulis."},
+ {w:"نَقْرَأُ الْقُرْآنَ قَبْلَ بَدْءِ الدَّرْسِ",x:"بَعْدَ",m:"Kami membaca Al-Qur'an sebelum pelajaran dimulai."},
+ {w:"فِي الْمَدْرَسَةِ مَعْمَلٌ لِلْحَاسُوبِ",x:"مِنْ",m:"Di madrasah ada laboratorium komputer."},
+ {w:"يَقِفُ الطُّلَّابُ فِي الطَّابُورِ صَبَاحًا",x:"عَنْ",m:"Para siswa berbaris di pagi hari."},
+ {w:"أَسْأَلُ الْمُدَرِّسَ عَنِ الْوَاجِبِ",x:"إِلَى",m:"Aku bertanya kepada guru tentang tugas."},
+ {w:"امْتِحَانُ الْعَرَبِيَّةِ يَوْمَ الْإِثْنَيْنِ",x:"مِنْ",m:"Ujian bahasa Arab hari Senin."},
+ {w:"نَحْتَرِمُ مُعَلِّمِينَا وَنُحِبُّهُمْ",x:"نَكْرَهُهُمْ",m:"Kami menghormati dan mencintai guru kami."},
+ {w:"مَلْعَبُ الْمَدْرَسَةِ وَاسِعٌ وَنَظِيفٌ",x:"فِي",m:"Lapangan madrasah luas dan bersih."}],
+"Hobi":[
+ {w:"يُحِبُّ جَارِي صَيْدَ السَّمَكِ",x:"مِنْ",m:"Tetanggaku suka memancing ikan."},
+ {w:"أُشَاهِدُ مُبَارَاةَ كُرَةِ الْقَدَمِ مَعَ أَبِي",x:"عَلَى",m:"Aku menonton pertandingan sepak bola bersama ayah."},
+ {w:"تَهْوَى أُخْتِي الطَّبْخَ وَالْخِيَاطَةَ",x:"عَنِ",m:"Saudariku menyukai memasak dan menjahit."},
+ {w:"أَقْرَأُ الْقِصَصَ فِي وَقْتِ الْفَرَاغِ",x:"إِلَى",m:"Aku membaca cerita di waktu luang."},
+ {w:"يَعْزِفُ أَخِي عَلَى الْجِيتَارِ",x:"مِنَ",m:"Kakakku memainkan gitar."},
+ {w:"نَتَسَلَّقُ الْجَبَلَ فِي الْإِجَازَةِ",x:"عَنِ",m:"Kami mendaki gunung saat liburan."},
+ {w:"أَلْتَقِطُ الصُّوَرَ بِالْكَامِيرَا",x:"إِلَى",m:"Aku mengambil foto dengan kamera."},
+ {w:"الرِّيَاضَةُ هِوَايَةٌ مُفِيدَةٌ لِلصِّحَّةِ",x:"ضَارَّةٌ",m:"Olahraga adalah hobi yang bermanfaat bagi kesehatan."},
+ {w:"أُحِبُّ تَرْبِيَةَ الْقِطَطِ فِي الْبَيْتِ",x:"أَكْرَهُ",m:"Aku suka memelihara kucing di rumah."},
+ {w:"نَلْعَبُ تِنِسَ الطَّاوِلَةِ فِي الْمَدْرَسَةِ",x:"مِنْ",m:"Kami bermain tenis meja di madrasah."}],
+"Profesi":[
+ {w:"الْمُعَلِّمُ يُرْشِدُ الطُّلَّابَ إِلَى الْخَيْرِ",x:"عَنِ",m:"Guru membimbing para siswa kepada kebaikan."},
+ {w:"الصَّيَّادُ يَصْطَادُ السَّمَكَ فِي الْبَحْرِ",x:"مِنَ",m:"Nelayan menangkap ikan di laut."},
+ {w:"الْمُحَامِي يُدَافِعُ عَنِ الْحَقِّ",x:"إِلَى",m:"Pengacara membela kebenaran."},
+ {w:"الصَّيْدَلِيُّ يَبِيعُ الْأَدْوِيَةَ",x:"فِي",m:"Apoteker menjual obat-obatan."},
+ {w:"الْمُحَاسِبُ يَحْسُبُ الْأَمْوَالَ فِي الشَّرِكَةِ",x:"عَلَى",m:"Akuntan menghitung uang di perusahaan."},
+ {w:"الْفَنَّانُ يَرْسُمُ لَوْحَةً جَمِيلَةً",x:"مِنْ",m:"Seniman melukis lukisan yang indah."},
+ {w:"الْإِمَامُ يَؤُمُّ النَّاسَ فِي الصَّلَاةِ",x:"عَنِ",m:"Imam memimpin orang-orang dalam shalat."},
+ {w:"الْجُنْدِيُّ يُدَافِعُ عَنِ الْوَطَنِ",x:"مِنَ",m:"Prajurit membela tanah air."},
+ {w:"أَيَّ مِهْنَةٍ تُحِبُّ يَا أَخِي؟",x:"أَيْنَ",m:"Pekerjaan apa yang kamu sukai, wahai saudaraku?"},
+ {w:"الْأُسْتَاذُ يَعْمَلُ بِجِدٍّ وَإِخْلَاصٍ",x:"فِي",m:"Ustaz bekerja dengan sungguh-sungguh dan ikhlas."}],
+"Wisata":[
+ {w:"زُرْنَا مَعْبَدَ بُورُوبُودُورَ الْقَدِيمَ",x:"فِي",m:"Kami mengunjungi candi Borobudur yang kuno."},
+ {w:"الْمُسَافِرُ يَحْمِلُ جَوَازَ السَّفَرِ",x:"عَنْ",m:"Musafir membawa paspor."},
+ {w:"وَصَلَتِ الطَّائِرَةُ إِلَى الْمَطَارِ مُتَأَخِّرَةً",x:"مُبَكِّرَةً",m:"Pesawat tiba di bandara terlambat."},
+ {w:"اسْتَأْجَرْنَا سَيَّارَةً لِلرِّحْلَةِ",x:"مِنَ",m:"Kami menyewa mobil untuk perjalanan."},
+ {w:"يُحِبُّ السُّيَّاحُ الْأَطْعِمَةَ الْمَحَلِّيَّةَ",x:"عَلَى",m:"Para wisatawan menyukai makanan lokal."},
+ {w:"سَبَحْنَا فِي مِيَاهِ الْبَحْرِ الصَّافِيَةِ",x:"إِلَى",m:"Kami berenang di air laut yang jernih."},
+ {w:"اشْتَرَى السَّائِحُ هَدَايَا تِذْكَارِيَّةً",x:"عَنِ",m:"Wisatawan membeli suvenir."},
+ {w:"سَأُسَافِرُ إِلَى الْيَابَانِ فِي الصَّيْفِ",x:"مِنَ",m:"Aku akan bepergian ke Jepang pada musim panas."},
+ {w:"الْخَرِيطَةُ تُرْشِدُنَا إِلَى الطَّرِيقِ",x:"عَنِ",m:"Peta menunjukkan kami jalan."},
+ {w:"عُدْنَا مِنَ الرِّحْلَةِ سَالِمِينَ",x:"إِلَى",m:"Kami pulang dari perjalanan dengan selamat."}],
+"Kesehatan":[
+ {w:"أَسْنَانِي تُؤْلِمُنِي كَثِيرًا",x:"قَلِيلًا",m:"Gigiku sangat sakit."},
+ {w:"أُنَظِّفُ أَسْنَانِي بَعْدَ الْأَكْلِ",x:"عَنْ",m:"Aku menggosok gigiku setelah makan."},
+ {w:"الْحُمَّى عَلَامَةُ الْمَرَضِ",x:"مِنْ",m:"Demam adalah tanda penyakit."},
+ {w:"يَجِبُ أَنْ نَأْكُلَ بِاعْتِدَالٍ",x:"عَلَى",m:"Kita harus makan secukupnya."},
+ {w:"الْمَرِيضُ يَحْتَاجُ إِلَى الرَّاحَةِ",x:"عَنِ",m:"Orang sakit membutuhkan istirahat."},
+ {w:"تَعَرَّضْتُ لِالْتِهَابٍ فِي الْحَلْقِ",x:"مِنَ",m:"Aku terkena radang tenggorokan."},
+ {w:"نَمْشِي نِصْفَ سَاعَةٍ كُلَّ صَبَاحٍ",x:"إِلَى",m:"Kami berjalan setengah jam setiap pagi."},
+ {w:"الْمُسْتَشْفَى يَسْتَقْبِلُ الْمَرْضَى لَيْلًا وَنَهَارًا",x:"فِي",m:"Rumah sakit menerima pasien siang dan malam."},
+ {w:"اللَّقَاحُ يَحْمِينَا مِنَ الْأَمْرَاضِ",x:"إِلَى",m:"Vaksin melindungi kita dari penyakit."},
+ {w:"الْعَقْلُ السَّلِيمُ فِي الْجِسْمِ السَّلِيمِ",x:"مِنَ",m:"Akal yang sehat ada dalam tubuh yang sehat."}],
+"Haji dan Umrah":[
+ {w:"نَذْهَبُ إِلَى مِنًى بَعْدَ الْإِحْرَامِ",x:"قَبْلَ",m:"Kami pergi ke Mina setelah berihram."},
+ {w:"يَبِيتُ الْحُجَّاجُ فِي مُزْدَلِفَةَ لَيْلًا",x:"عَنْ",m:"Para jamaah bermalam di Muzdalifah pada malam hari."},
+ {w:"الْكَعْبَةُ قِبْلَةُ الْمُسْلِمِينَ",x:"مِنَ",m:"Ka'bah adalah kiblat kaum Muslimin."},
+ {w:"يُؤَدِّي الْمُسْلِمُ فَرِيضَةَ الْحَجِّ مَرَّةً",x:"عَنْ",m:"Seorang Muslim menunaikan kewajiban haji sekali."},
+ {w:"نَسْتَلِمُ الْحَجَرَ الْأَسْوَدَ عِنْدَ الطَّوَافِ",x:"فِي",m:"Kami mengusap Hajar Aswad saat thawaf."},
+ {w:"يَذْبَحُ الْحَاجُّ الْهَدْيَ يَوْمَ النَّحْرِ",x:"مِنْ",m:"Jamaah haji menyembelih hewan hadyu pada hari Nahar."},
+ {w:"سَافَرَتْ جَدَّتِي إِلَى الْأَرَاضِي الْمُقَدَّسَةِ",x:"مِنَ",m:"Nenekku bepergian ke Tanah Suci."},
+ {w:"تُسَنُّ الصَّلَاةُ فِي الْمَسْجِدِ النَّبَوِيِّ",x:"عَنِ",m:"Disunahkan shalat di Masjid Nabawi."},
+ {w:"الْحَاجُّ يَدْعُو اللَّهَ فِي عَرَفَةَ",x:"إِلَى",m:"Jamaah haji berdoa kepada Allah di Arafah."},
+ {w:"يَعُودُ الْحَاجُّ إِلَى وَطَنِهِ سَعِيدًا",x:"مِنْ",m:"Jamaah haji kembali ke tanah airnya dengan bahagia."}],
+"Agama-agama di Indonesia":[
+ {w:"يَحْتَفِلُ الْمُسْلِمُونَ بِعِيدِ الْفِطْرِ",x:"عَنْ",m:"Umat Islam merayakan Idulfitri."},
+ {w:"يَحْتَفِلُ الْمَسِيحِيُّونَ بِعِيدِ الْمِيلَادِ",x:"مِنْ",m:"Umat Kristen merayakan Natal."},
+ {w:"إِنْدُونِيسِيَا تَضُمُّ سِتَّةَ أَدْيَانٍ رَسْمِيَّةٍ",x:"عَنْ",m:"Indonesia memiliki enam agama resmi."},
+ {w:"يَتَبَادَلُ النَّاسُ التَّهَانِيَ فِي الْأَعْيَادِ",x:"إِلَى",m:"Orang-orang saling mengucapkan selamat pada hari raya."},
+ {w:"الْمَسْجِدُ وَالْكَنِيسَةُ يَقِفَانِ جَنْبًا إِلَى جَنْبٍ",x:"مِنْ",m:"Masjid dan gereja berdiri berdampingan."},
+ {w:"لَا إِكْرَاهَ فِي الدِّينِ",x:"عَنْ",m:"Tidak ada paksaan dalam agama."},
+ {w:"يَعِيشُ الشَّعْبُ الْإِنْدُونِيسِيُّ مُتَسَامِحًا",x:"فِي",m:"Rakyat Indonesia hidup dengan toleran."},
+ {w:"زَارَ الطُّلَّابُ دُورَ الْعِبَادَةِ الْمُخْتَلِفَةَ",x:"عَلَى",m:"Para siswa mengunjungi berbagai rumah ibadah."},
+ {w:"الْحِوَارُ بَيْنَ الْأَدْيَانِ يُقَوِّي الْأُخُوَّةَ",x:"مِنَ",m:"Dialog antar agama memperkuat persaudaraan."},
+ {w:"نَحْمِي بِلَادَنَا مِنَ الْفُرْقَةِ وَالْعُنْفِ",x:"إِلَى",m:"Kami menjaga negeri kami dari perpecahan dan kekerasan."}]
+};
+LEVELS.forEach(l=>{if(l.kelas<12&&EXTRA[l.id])l.items.push(...EXTRA[l.id])});
+const EXTRA12={
+"Teknologi Informasi dan Komunikasi":[
+ {w:"أَحْفَظُ مِلَفَّاتِي عَلَى الْحَاسُوبِ",x:"مِنَ",m:"Aku menyimpan berkasku di komputer."},
+ {w:"يُشَارِكُ الطُّلَّابُ فِي دُرُوسٍ إِلَكْتُرُونِيَّةٍ",x:"عَنْ",m:"Para siswa mengikuti pelajaran daring."},
+ {w:"تَنْتَشِرُ الْأَخْبَارُ عَلَى الشَّبَكَةِ بِسُرْعَةٍ",x:"إِلَى",m:"Berita menyebar di jaringan dengan cepat."},
+ {w:"أُحَمِّلُ التَّطْبِيقَ الْجَدِيدَ عَلَى هَاتِفِي",x:"مِنْ",m:"Aku mengunduh aplikasi baru di teleponku."},
+ {w:"الْمُسْلِمُ الْوَاعِي يَسْتَفِيدُ مِنَ التِّقْنِيَةِ",x:"عَنِ",m:"Muslim yang sadar memanfaatkan teknologi."}],
+"Tokoh-tokoh Islam":[
+ {w:"كَانَ ابْنُ الْهَيْثَمِ عَالِمًا فِي الْبَصَرِيَّاتِ",x:"عَنْ",m:"Ibnu Haitham adalah ilmuwan di bidang optika."},
+ {w:"جَاهَدَ الْأَمِيرُ عَبْدُ الْقَادِرِ ضِدَّ الِاسْتِعْمَارِ",x:"مَعَ",m:"Amir Abdul Qadir berjuang melawan penjajahan."},
+ {w:"عَاشَ الْإِمَامُ أَبُو حَنِيفَةَ فِي الْكُوفَةِ",x:"إِلَى",m:"Imam Abu Hanifah hidup di Kufah."},
+ {w:"كَانَتْ عَائِشَةُ رَضِيَ اللَّهُ عَنْهَا عَالِمَةً",x:"مِنْ",m:"Aisyah radhiyallahu anha adalah seorang ahli ilmu."},
+ {w:"سَاهَمَ عُلَمَاءُ الْإِسْلَامِ فِي بِنَاءِ الْحَضَارَةِ",x:"عَلَى",m:"Ulama Islam berperan dalam membangun peradaban."}],
+"Kuliah di Universitas":[
+ {w:"تَبْدَأُ السَّنَةُ الدِّرَاسِيَّةُ فِي شَهْرِ سِبْتَمْبَرَ",x:"عَنْ",m:"Tahun ajaran dimulai pada bulan September."},
+ {w:"أَدْفَعُ الرُّسُومَ الدِّرَاسِيَّةَ فِي أَوَّلِ الْفَصْلِ",x:"مِنْ",m:"Aku membayar biaya kuliah di awal semester."},
+ {w:"يُسَاعِدُنِي الْمُرْشِدُ الْأَكَادِيمِيُّ فِي اخْتِيَارِ الْمَوَادِّ",x:"عَلَى",m:"Dosen wali membantuku memilih mata kuliah."},
+ {w:"نُنَاقِشُ الْمَوْضُوعَ فِي حَلْقَةِ النِّقَاشِ",x:"إِلَى",m:"Kami mendiskusikan topik itu dalam forum diskusi."},
+ {w:"أَسْتَعِدُّ لِلِاخْتِبَارِ النِّهَائِيِّ بِجِدٍّ",x:"عَنْ",m:"Aku bersiap untuk ujian akhir dengan sungguh-sungguh."}]
+};
+LEVELS.forEach(l=>{if(l.kelas===12&&EXTRA12[l.id])l.items.push(...EXTRA12[l.id])});
+
 const TEAMNAMES=["Alif","Ba","Ta","Tsa","Jim","Ha","Kho","Dal"];
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -286,14 +600,17 @@ function shuffle(a){const r=a.slice();for(let i=r.length-1;i>0;i--){const j=Math
 /* ---------- state ---------- */
 let db=null,user=null,uid=null,isTeacher=false,myName="",loadFailed=false;
 let session=null,players={},scores={};
+let history={},archiving=null,archiveBlock=0,loaded={p:false,s:false,h:false};
 let mode="practice",gameOver=false,sessRun=null,sessCfg=null,offset=0;
 let lv=0,qi=0,score=0,solved=0,answered=0,tries=0,hinted=0,done=false,qStart=0,qExpired=false;
 let round=[],bank=[],slots=[];
-let best=[0,0,0,0];
-try{const s=JSON.parse(localStorage.getItem("susun-best")||"[]");if(Array.isArray(s))best=[0,1,2,3].map(i=>+s[i]||0)}catch(e){}
+let kelas=11;
+let best=LEVELS.map(()=>0);
+try{const s=JSON.parse(localStorage.getItem("susun-best2")||"[]");if(Array.isArray(s))best=LEVELS.map((_,i)=>+s[i]||0)}catch(e){}
 
-const poolOf=th=>th==="all"?LEVELS.flatMap(l=>l.items):LEVELS[+th].items;
-const themeName=th=>th==="all"?"Campuran semua tema":LEVELS[+th].id;
+const roman=k=>({10:"X",11:"XI",12:"XII"})[k]||"XI";const isK=th=>/^k\d+$/.test(th);
+const poolOf=th=>th==="all"?LEVELS.flatMap(l=>l.items):isK(th)?LEVELS.filter(l=>l.kelas===+th.slice(1)).flatMap(l=>l.items):LEVELS[+th].items;
+const themeName=th=>th==="all"?"Campuran semua kelas":isK(th)?"Campuran Kelas "+roman(+th.slice(1)):roman(LEVELS[+th].kelas)+" · "+LEVELS[+th].id;
 function effStatus(){
   if(!session)return null;
   if(session.status==="running"&&session.totalMin>0&&Date.now()>=session.startedAt+session.totalMin*60000)return "ended";
@@ -307,9 +624,16 @@ const cur=()=>round[qi];
 const words=()=>cur().w.split(" ");
 
 function renderLevels(){
-  $("levels").hidden=mode==="session";
-  $("levels").innerHTML=LEVELS.map((l,i)=>`<button class="lv" data-i="${i}" aria-pressed="${i===lv}"><span class="ar" lang="ar" dir="rtl">${l.ar}</span><span class="id">${l.id}</span><span class="st">Terbaik: ${best[i]} / 80 · bank ${l.items.length} soal</span></button>`).join("");
+  const sess=mode==="session";
+  $("levels").hidden=sess;$("kelasbar").hidden=sess;
+  $("kelasbar").innerHTML=[10,11,12].map(k=>`<button class="kb" data-k="${k}" aria-pressed="${k===kelas}">Kelas ${roman(k)}</button>`).join("");
+  $("levels").innerHTML=LEVELS.map((l,i)=>l.kelas!==kelas?"":`<button class="lv" data-i="${i}" aria-pressed="${i===lv}"><span class="ar" lang="ar" dir="rtl">${l.ar}</span><span class="id">${l.id}</span><span class="st">Terbaik: ${best[i]} / 80 · bank ${l.items.length} soal</span></button>`).join("");
 }
+$("kelasbar").addEventListener("click",e=>{
+  const b=e.target.closest(".kb");if(!b)return;
+  const k=+b.dataset.k;if(k===kelas)return;
+  kelas=k;lv=LEVELS.findIndex(l=>l.kelas===k);startPractice();
+});
 $("levels").addEventListener("click",e=>{const b=e.target.closest(".lv");if(!b)return;lv=+b.dataset.i;startPractice()});
 
 function startPractice(){
@@ -352,7 +676,7 @@ function draw(msg,cls){
   const n=offset+round.length,q=cur();
   const sess=mode==="session"&&sessCfg&&sessCfg.perQ>0;
   $("card").innerHTML=`
-   <div class="meta"><span>Soal ${offset+qi+1} dari ${n}</span><span>${mode==="session"?"Sesi kelas":LEVELS[lv].id}</span></div>
+   <div class="meta"><span>Soal ${offset+qi+1} dari ${n}</span><span>${mode==="session"?"Sesi kelas":"Kelas "+roman(LEVELS[lv].kelas)+" · "+LEVELS[lv].id}</span></div>
    <div class="bar"><i style="width:${(offset+qi)/n*100}%"></i></div>
    ${sess?`<div class="bar q"><i id="qbar" style="width:100%"></i></div><div class="qt"><span>Waktu soal</span><span id="qleft">${sessCfg.perQ} d</span></div>`:""}
    <p class="mean"><em>Artinya</em>${esc(q.m)}</p>
@@ -443,9 +767,10 @@ function finish(reason){
   }
   const l=LEVELS[lv],max=round.length*10,pct=score/max;
   const st=pct>=.85?3:pct>=.6?2:1;
-  if(score>best[lv]){best[lv]=score;try{localStorage.setItem("susun-best",JSON.stringify(best))}catch(e){}}
+  if(score>best[lv]){best[lv]=score;try{localStorage.setItem("susun-best2",JSON.stringify(best))}catch(e){}}
   renderLevels();
-  const nextLv=(lv+1)%LEVELS.length;
+  const same=LEVELS.map((x,i)=>i).filter(i=>LEVELS[i].kelas===LEVELS[lv].kelas);
+  const nextLv=same[(same.indexOf(lv)+1)%same.length];
   $("card").innerHTML=`<div class="end">
     <div class="stars" aria-label="${st} dari 3 bintang">${"★".repeat(st)}${"☆".repeat(3-st)}</div>
     <h2>Latihan selesai</h2>
@@ -462,6 +787,7 @@ function finish(reason){
 function tick(){
   const st=effStatus();
   const clk=$("clock");
+  if(isTeacher&&db&&session&&session.runId)maybeArchive();
   if(clk){
     if(!session)clk.textContent="";
     else if(st==="running"){
@@ -550,7 +876,7 @@ $("join").addEventListener("click",async e=>{
   }
 });
 
-let boardHtml="";
+let boardHtml="",projOn=false;
 function renderBoard(){
   const el=$("board");
   if(!db||!session||!session.runId){el.hidden=true;return}
@@ -563,21 +889,33 @@ function renderBoard(){
       const m=act.filter(([id,p])=>p.teamId===t.id);
       const tot=m.reduce((a,[id])=>a+(sc(id)?sc(id).score:0),0);
       const mine=m.some(([id])=>id===uid);
-      return {name:t.name,sub:m.length+" anggota",main:m.length?Math.round(tot/m.length*10)/10:0,small:"total "+tot,me:mine,key:m.length?tot/m.length:0};
+      const det=isTeacher?m.slice().sort((a,b)=>(sc(b[0])?sc(b[0]).score:0)-(sc(a[0])?sc(a[0]).score:0)).map(([id,p])=>p.name+" "+(sc(id)?sc(id).score:0)+(sc(id)&&sc(id).done?" ✓":"")).join(" · "):"";
+      const ans=m.reduce((a,[id])=>a+(sc(id)?sc(id).answered:0),0);
+      return {name:t.name,det,sub:m.length+" anggota · "+ans+" jawaban",main:m.length?Math.round(tot/m.length*10)/10:0,small:"total "+tot,me:mine,key:m.length?tot/m.length:0};
     }).filter(r=>r.sub!=="0 anggota").sort((a,b)=>b.key-a.key);
   }else{
     rows=act.map(([id,p])=>{const s=sc(id);return {name:p.name,sub:s?(s.done?"selesai · ":"")+s.answered+" soal":"belum mulai",main:s?s.score:0,small:"poin",me:id===uid,key:s?s.score:-1}}).sort((a,b)=>b.key-a.key||a.name.localeCompare(b.name));
   }
-  let h=`<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><h3>Papan skor</h3><span class="note">${session.mode==="team"?"urut rata-rata skor per anggota":"urut skor"}</span></div>`;
-  h+=rows.length?`<ol>${rows.map((r,i)=>`<li class="${r.me?"me":""}"><span class="rk">${i+1}</span><span class="nm">${esc(r.name)}${r.me?" (kamu)":""}<small>${esc(r.sub)}</small></span><span class="pt">${r.main}<small>${esc(r.small)}</small></span></li>`).join("")}</ol>`:`<p class="note" style="margin:0">Belum ada peserta di sesi ini.</p>`;
+  let h=`<div class="hd"><h3>Papan skor</h3><span class="note">${session.mode==="team"?"urut rata-rata skor per anggota":"urut skor"}</span>${isTeacher?`<button class="b sm" data-act="proj">${projOn?"Tutup layar proyektor":"Layar proyektor"}</button>`:""}</div>`;
+  h+=rows.length?`<ol>${rows.map((r,i)=>`<li class="${r.me?"me":""}"><span class="rk">${i+1}</span><span class="nm">${esc(r.name)}${r.me?" (kamu)":""}<small>${esc(r.sub)}</small>${r.det?`<span class="mem">${esc(r.det)}</span>`:""}</span><span class="pt">${r.main}<small>${esc(r.small)}</small></span></li>`).join("")}</ol>`:`<p class="note" style="margin:0">Belum ada peserta di sesi ini.</p>`;
   el.hidden=false;
+  el.classList.toggle("proj",projOn);el.classList.toggle("dense",rows.length>4);
   if(h!==boardHtml){boardHtml=h;el.innerHTML=h}
 }
+function setProj(on){
+  projOn=!!on;boardHtml="";renderBoard();
+  try{if(on&&$("board").requestFullscreen)$("board").requestFullscreen().catch(()=>{});else if(!on&&document.fullscreenElement)document.exitFullscreen().catch(()=>{})}catch(e){}
+}
+document.addEventListener("fullscreenchange",()=>{if(!document.fullscreenElement&&projOn)setProj(false)});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&projOn)setProj(false)});
+$("board").addEventListener("click",e=>{const b=e.target.closest("button[data-act=proj]");if(b)setProj(!projOn)});
 
 /* ---------- panel guru ---------- */
 let formFilled=false,rosterHtml="";
 function fillTheme(){
-  $("ttheme").innerHTML=`<option value="all">Campuran semua tema (60 soal)</option>`+LEVELS.map((l,i)=>`<option value="${i}">${l.id} (${l.items.length} soal)</option>`).join("");
+  const opt=(v,tx)=>`<option value="${v}">${tx}</option>`;
+  const grp=k=>`<optgroup label="Kelas ${roman(k)}">`+opt("k"+k,"Campuran Kelas "+roman(k)+" ("+poolOf("k"+k).length+" soal)")+LEVELS.map((l,i)=>l.kelas===k?opt(i,l.id+" ("+l.items.length+" soal)"):"").join("")+`</optgroup>`;
+  $("ttheme").innerHTML=opt("all","Campuran semua kelas ("+poolOf("all").length+" soal)")+grp(10)+grp(11)+grp(12);
 }
 function syncTeamRow(){
   const tm=document.querySelector('input[name=tmode]:checked').value==="team";
@@ -613,9 +951,9 @@ async function saveSession(over,okText){
   }catch(e){tmsg("Gagal menyimpan: "+ec(e),false);return false}
 }
 $("tsave").onclick=()=>saveSession(null,"Pengaturan disimpan.");
-$("tstart").onclick=()=>saveSession({status:"running",runId:"r"+Date.now().toString(36),startedAt:Date.now()},"Sesi dimulai.");
-$("tstop").onclick=()=>saveSession({status:"ended"},"Sesi diakhiri.");
-$("treset").onclick=()=>saveSession({status:"lobby",runId:null,startedAt:null},"Kembali ke lobi. Skor sesi sebelumnya tidak ditampilkan lagi.");
+$("tstart").onclick=async()=>{await archiveRun();saveSession({status:"running",runId:"r"+Date.now().toString(36),startedAt:Date.now(),endedAt:null},"Sesi dimulai.")};
+$("tstop").onclick=()=>saveSession({status:"ended",endedAt:Date.now()},"Sesi diakhiri. Hasil akan tersimpan ke Riwayat hasil dalam beberapa detik.");
+$("treset").onclick=async()=>{const ok=await archiveRun();saveSession({status:"lobby",runId:null,startedAt:null,endedAt:null},ok===true?"Kembali ke lobi. Hasil sesi sebelumnya tersimpan di Riwayat hasil.":"Kembali ke lobi.")};
 $("tshuffle").onclick=async()=>{
   if(!session||session.mode!=="team"||!(session.teams||[]).length){tmsg("Simpan mode Tim dulu.",false);return}
   const ids=shuffle(Object.keys(players).filter(id=>!players[id].removed));
@@ -633,7 +971,7 @@ function renderRoster(){
   const h=ids.length?ids.map(id=>{
     const p=players[id],s=scores[id]&&scores[id].runId===run?scores[id]:null;
     const sel=tm?`<select data-id="${id}" aria-label="Tim ${esc(p.name)}"><option value="">Tanpa tim</option>${(session.teams||[]).map(t=>`<option value="${t.id}" ${p.teamId===t.id?"selected":""}>${esc(t.name)}</option>`).join("")}</select>`:"";
-    return `<div class="rrow ${tm?"tm":""} ${p.removed?"gone":""}"><span class="nm">${esc(p.name)}</span>${sel}<span class="sc">${s?s.score+" poin":"–"}</span><button class="b sm" data-act="${p.removed?"restore":"rm"}" data-id="${id}">${p.removed?"Pulihkan":"Keluarkan"}</button></div>`;
+    return `<div class="rrow ${tm?"tm":""} ${p.removed?"gone":""}"><span class="nm">${esc(p.name)}</span>${sel}<span class="sc">${s?s.score+" poin":"–"}</span><span class="rbtns"><button class="b sm" data-act="${p.removed?"restore":"rm"}" data-id="${id}">${p.removed?"Pulihkan":"Keluarkan"}</button><button class="b sm warn" data-act="del" data-id="${id}">Hapus</button></span></div>`;
   }).join(""):`<p class="note" style="margin:0">Belum ada peserta yang mendaftar. Bagikan tautan halaman ini ke siswa.</p>`;
   if(h!==rosterHtml){rosterHtml=h;$("roster").innerHTML=h}
   const st=effStatus();
@@ -641,9 +979,23 @@ function renderRoster(){
   $("tstop").disabled=st!=="running";
   $("treset").disabled=!session||session.status==="lobby";
 }
+let delArm="",delTimer=null;
 $("roster").addEventListener("click",async e=>{
   const b=e.target.closest("button[data-act]");if(!b)return;
-  try{await db.doc("players/"+b.dataset.id).update({removed:b.dataset.act==="rm"})}
+  const id=b.dataset.id,act=b.dataset.act;
+  if(act==="del"){
+    if(delArm!==id){
+      delArm=id;b.textContent="Yakin?";
+      clearTimeout(delTimer);
+      delTimer=setTimeout(()=>{delArm="";if(b.isConnected)b.textContent="Hapus"},4000);
+      return;
+    }
+    clearTimeout(delTimer);delArm="";b.disabled=true;
+    try{await db.doc("scores/"+id).delete();await db.doc("players/"+id).delete();tmsg("Peserta dihapus.",true)}
+    catch(err){b.disabled=false;tmsg("Gagal menghapus peserta: "+ec(err),false)}
+    return;
+  }
+  try{await db.doc("players/"+id).update({removed:act==="rm"})}
   catch(err){tmsg("Gagal mengubah peserta: "+ec(err),false)}
 });
 $("roster").addEventListener("change",async e=>{
@@ -651,6 +1003,140 @@ $("roster").addEventListener("change",async e=>{
   try{await db.doc("players/"+s.dataset.id).update({teamId:s.value})}
   catch(err){tmsg("Gagal memindah tim: "+ec(err),false)}
 });
+
+/* ---------- riwayat hasil ---------- */
+function snapshotRun(){
+  const run=session.runId;
+  const rows=Object.entries(players).filter(([id,p])=>!p.removed).map(([id,p])=>{
+    const s=scores[id]&&scores[id].runId===run?scores[id]:null;
+    return {name:String(p.name||""),team:teamName(p.teamId)||"",score:s?s.score:0,solved:s?s.solved:0,answered:s?s.answered:0,done:!!(s&&s.done)};
+  });
+  return {runId:run,mode:session.mode,theme:themeName(session.theme),count:session.count,totalMin:session.totalMin,perQ:session.perQ,startedAt:session.startedAt||0,savedAt:Date.now(),rows};
+}
+async function archiveRun(){
+  if(!isTeacher||!db||!session||!session.runId)return null;
+  if(!(loaded.p&&loaded.s&&loaded.h))return false;
+  const id="h_"+session.runId;
+  if(history[id]||archiving===session.runId)return true;
+  archiving=session.runId;
+  try{await db.doc("session/"+id).set(snapshotRun());tmsg("Hasil sesi tersimpan di Riwayat hasil.",true);return true}
+  catch(e){archiving=null;archiveBlock=Date.now()+15000;tmsg("Gagal menyimpan riwayat: "+ec(e),false);return false}
+}
+function endTs(){
+  if(!session||!session.runId)return 0;
+  if(session.status==="ended")return session.endedAt||session.updatedAt||0;
+  if(session.status==="running"&&session.totalMin>0)return session.startedAt+session.totalMin*60000;
+  return 0;
+}
+function maybeArchive(){const t=endTs();if(t&&Date.now()>=t+6000&&Date.now()>=archiveBlock)archiveRun()}
+function fmtDate(ts){try{return new Date(ts).toLocaleString("id-ID",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"})}catch(e){return ""}}
+let histHtml="";
+function renderHistory(){
+  const el=$("hist");if(!el)return;
+  const ids=Object.keys(history).sort((a,b)=>(history[b].savedAt||0)-(history[a].savedAt||0));
+  const h=ids.length?ids.map(id=>{
+    const r=history[id],rows=(r.rows||[]).slice(),team=r.mode==="team";
+    let body="";
+    if(team){
+      const g={};rows.forEach(x=>{const k=x.team||"Tanpa tim";(g[k]=g[k]||[]).push(x)});
+      const tl=Object.keys(g).map(k=>{const m=g[k],tot=m.reduce((a,x)=>a+x.score,0);return {k,m,tot,avg:Math.round(tot/m.length*10)/10}}).sort((a,b)=>b.avg-a.avg);
+      body=`<table><thead><tr><th>Tim</th><th>Rata-rata</th><th>Total</th><th>Anggota (skor)</th></tr></thead><tbody>${tl.map(t=>`<tr><td>${esc(t.k)}</td><td>${t.avg}</td><td>${t.tot}</td><td>${t.m.map(x=>esc(x.name)+" ("+x.score+")").join(", ")}</td></tr>`).join("")}</tbody></table>`;
+    }else{
+      rows.sort((a,b)=>b.score-a.score);
+      body=`<table><thead><tr><th>#</th><th>Nama</th><th>Skor</th><th>Benar</th></tr></thead><tbody>${rows.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.name)}</td><td>${x.score}</td><td>${x.solved}/${r.count}</td></tr>`).join("")}</tbody></table>`;
+    }
+    return `<details class="hrow"><summary>${esc(fmtDate(r.savedAt))} · ${esc(r.theme)} · ${team?"Tim":"Perorangan"} · ${rows.length} peserta</summary><div class="hb"><div style="overflow-x:auto">${body}</div><div class="actions"><button class="b sm" data-act="print" data-id="${id}">Cetak laporan (PDF)</button><button class="b sm" data-act="csv" data-id="${id}">Unduh CSV</button><button class="b sm warn" data-act="hdel" data-id="${id}">Hapus riwayat</button></div></div></details>`;
+  }).join(""):`<p class="note" style="margin:0">Belum ada riwayat. Hasil tersimpan otomatis setelah sesi selesai.</p>`;
+  if(h!==histHtml){histHtml=h;el.innerHTML=h}
+}
+function runCalc(h){
+  const rows=(h.rows||[]).map(x=>Object.assign({},x));
+  const team=h.mode==="team",cnt=h.count||0;
+  const pct=x=>cnt?Math.round(x.solved/cnt*100):0;
+  rows.forEach(x=>{x.pct=pct(x)});
+  let teams=[];
+  if(team){
+    const g={};rows.forEach(x=>{const k=x.team||"Tanpa tim";(g[k]=g[k]||[]).push(x)});
+    teams=Object.keys(g).map(k=>{const m=g[k].sort((p,q)=>q.score-p.score),tot=m.reduce((s,x)=>s+x.score,0),sv=m.reduce((s,x)=>s+x.solved,0);return {k,m,tot,avg:Math.round(tot/m.length*10)/10,pct:cnt?Math.round(sv/(cnt*m.length)*100):0}}).sort((p,q)=>q.avg-p.avg);
+    teams.forEach((t,i)=>{t.rank=i+1;t.m.forEach(x=>{x.rank=i+1})});
+    rows.length=0;teams.forEach(t=>t.m.forEach(x=>rows.push(x)));
+  }else{
+    rows.sort((p,q)=>q.score-p.score||p.name.localeCompare(q.name));
+    rows.forEach((x,i)=>{x.rank=i+1});
+  }
+  return {team,rows,teams,cnt};
+}
+const csvQ=v=>{let s=String(v);if(/^[=+\-@\t\r]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"'};
+const fmtFull=ts=>{const d=new Date(ts),p=n=>String(n).padStart(2,"0");return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes())};
+const CSVHEAD=["Tanggal","Tema","Mode","Peringkat","Tim","Nama","Skor","Benar","Jumlah soal","Persen benar","Dijawab","Selesai"];
+function csvRows(h){
+  const c=runCalc(h);
+  return c.rows.map(x=>[fmtFull(h.savedAt),h.theme,c.team?"Tim":"Perorangan",x.rank,x.team,x.name,x.score,x.solved,c.cnt,x.pct+"%",x.answered,x.done?"ya":"tidak"]);
+}
+function csvOf(h){
+  const c=runCalc(h);
+  let lines=[CSVHEAD].concat(csvRows(h));
+  if(c.team){
+    lines=lines.concat([[]],[["Ringkasan tim"]],[["Peringkat","Tim","Jumlah anggota","Rata-rata skor","Total skor","Persen benar"]],c.teams.map(t=>[t.rank,t.k,t.m.length,t.avg,t.tot,t.pct+"%"]));
+  }
+  return "\ufeff"+lines.map(r=>r.map(csvQ).join(",")).join("\r\n");
+}
+function csvAll(){
+  const ids=Object.keys(history).sort((a,b)=>(history[a].savedAt||0)-(history[b].savedAt||0));
+  let lines=[CSVHEAD];ids.forEach(id=>{lines=lines.concat(csvRows(history[id]))});
+  return "\ufeff"+lines.map(r=>r.map(csvQ).join(",")).join("\r\n");
+}
+function saveBlob(text,name){
+  const blob=new Blob([text],{type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function stampOf(ts){const d=new Date(ts),p=n=>String(n).padStart(2,"0");return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate())+"-"+p(d.getHours())+p(d.getMinutes())}
+function reportHtml(h){
+  const c=runCalc(h),dur=h.totalMin?h.totalMin+" menit":"tanpa batas";
+  const meta=[["Tanggal",fmtFull(h.savedAt)],["Tema",h.theme],["Mode",c.team?"Tim":"Perorangan"],["Jumlah soal",c.cnt],["Waktu total",dur],["Waktu per soal",h.perQ?h.perQ+" detik":"tanpa batas"],["Jumlah peserta",c.rows.length]];
+  let body="";
+  if(c.team){
+    body+=`<h2>Peringkat tim</h2><table><thead><tr><th>#</th><th>Tim</th><th>Anggota</th><th>Rata-rata skor</th><th>Total skor</th><th>Persen benar</th></tr></thead><tbody>${c.teams.map(t=>`<tr><td>${t.rank}</td><td>${esc(t.k)}</td><td>${t.m.length}</td><td>${t.avg}</td><td>${t.tot}</td><td>${t.pct}%</td></tr>`).join("")}</tbody></table>`;
+    body+=`<h2>Rincian anggota tiap tim</h2><table><thead><tr><th>Tim</th><th>Nama</th><th>Skor</th><th>Benar</th><th>Dijawab</th><th>Selesai</th></tr></thead><tbody>${c.rows.map(x=>`<tr><td>${esc(x.team||"Tanpa tim")}</td><td>${esc(x.name)}</td><td>${x.score}</td><td>${x.solved}/${c.cnt}</td><td>${x.answered}</td><td>${x.done?"ya":"tidak"}</td></tr>`).join("")}</tbody></table>`;
+  }else{
+    body+=`<h2>Peringkat peserta</h2><table><thead><tr><th>#</th><th>Nama</th><th>Skor</th><th>Benar</th><th>Persen benar</th><th>Dijawab</th><th>Selesai</th></tr></thead><tbody>${c.rows.map(x=>`<tr><td>${x.rank}</td><td>${esc(x.name)}</td><td>${x.score}</td><td>${x.solved}/${c.cnt}</td><td>${x.pct}%</td><td>${x.answered}</td><td>${x.done?"ya":"tidak"}</td></tr>`).join("")}</tbody></table>`;
+  }
+  return `<h1>Laporan Hasil Susun Kalimat Arab</h1><table class="rmeta"><tbody>${meta.map(m=>`<tr><td>${m[0]}</td><td>${esc(m[1])}</td></tr>`).join("")}</tbody></table>${body}<div class="sign"><div>Guru Bahasa Arab<br><br><br><br>( ____________________ )</div></div>`;
+}
+function printReport(id){
+  const h=history[id];if(!h)return;
+  const pa=$("printarea");pa.innerHTML=reportHtml(h);
+  const done=()=>{document.body.classList.remove("printing");pa.innerHTML="";window.removeEventListener("afterprint",done)};
+  window.addEventListener("afterprint",done);
+  document.body.classList.add("printing");
+  setTimeout(()=>{try{window.print()}catch(e){done()}},50);
+}
+function downloadCsv(id){const h=history[id];if(h)saveBlob(csvOf(h),"hasil-"+stampOf(h.savedAt)+".csv")}
+$("hist").addEventListener("click",async e=>{
+  const b=e.target.closest("button[data-act]");if(!b)return;
+  const id=b.dataset.id;
+  if(b.dataset.act==="csv"){downloadCsv(id);return}
+  if(b.dataset.act==="print"){printReport(id);return}
+  if(b.dataset.act==="hdel"){
+    if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Yakin? Klik lagi";setTimeout(()=>{b.dataset.arm="";b.textContent="Hapus riwayat"},4000);return}
+    try{await db.doc("session/"+id).delete()}catch(err){tmsg("Gagal menghapus riwayat: "+ec(err),false)}
+  }
+});
+let clearTimer=null,clearArmed=false;
+$("hall").onclick=()=>{if(!Object.keys(history).length){tmsg("Belum ada riwayat untuk diunduh.",false);return}saveBlob(csvAll(),"hasil-semua-sesi-"+stampOf(Date.now())+".csv")};
+$("tclear").onclick=async()=>{
+  const b=$("tclear");
+  if(!clearArmed){clearArmed=true;b.textContent="Yakin? Klik lagi";clearTimeout(clearTimer);clearTimer=setTimeout(()=>{clearArmed=false;b.textContent="Hapus semua peserta"},4000);return}
+  clearArmed=false;clearTimeout(clearTimer);b.textContent="Hapus semua peserta";b.disabled=true;
+  try{
+    await archiveRun();
+    const ids=new Set(Object.keys(players).concat(Object.keys(scores)));
+    for(const id of ids){await db.doc("players/"+id).delete();await db.doc("scores/"+id).delete()}
+    tmsg("Semua peserta dan skor dihapus. Siswa bisa mendaftar ulang.",true);
+  }catch(e){tmsg("Gagal menghapus peserta: "+ec(e),false)}
+  b.disabled=false;
+};
 
 /* ---------- data bersama ---------- */
 function onData(){
@@ -662,12 +1148,14 @@ const ec=e=>e&&e.code==="permission-denied"?"akun ini bukan akun guru yang terda
 function configured(){return typeof FIREBASE_CONFIG==="object"&&FIREBASE_CONFIG.apiKey&&String(FIREBASE_CONFIG.apiKey).indexOf("PASTE")<0}
 function startListeners(){
   subs.splice(0).forEach(f=>{try{f()}catch(e){}});
+  loaded.p=loaded.s=loaded.h=false;history={};
   const t=setTimeout(()=>{loadFailed=true;renderBanner()},10000);
   const ok=()=>{clearTimeout(t);loadFailed=false};
   const bad=()=>{clearTimeout(t);loadFailed=true;renderBanner()};
   subs.push(db.doc("session/current").onSnapshot(s=>{ok();session=s.exists?s.data():null;onData()},bad));
-  subs.push(db.collection("players").onSnapshot(q=>{ok();players={};q.docs.forEach(x=>{players[x.id]=x.data()});onData()},bad));
-  subs.push(db.collection("scores").onSnapshot(q=>{ok();scores={};q.docs.forEach(x=>{scores[x.id]=x.data()});onData()},bad));
+  subs.push(db.collection("players").onSnapshot(q=>{ok();players={};q.docs.forEach(x=>{players[x.id]=x.data()});loaded.p=true;onData()},bad));
+  subs.push(db.collection("scores").onSnapshot(q=>{ok();scores={};q.docs.forEach(x=>{scores[x.id]=x.data()});loaded.s=true;onData()},bad));
+  if(isTeacher)subs.push(db.collection("session").onSnapshot(q=>{history={};q.docs.forEach(x=>{if(x.id.indexOf("h_")===0)history[x.id]=x.data()});loaded.h=true;renderHistory()},()=>{}));
 }
 $("tlform").addEventListener("submit",async e=>{
   e.preventDefault();
@@ -684,7 +1172,8 @@ async function initLive(){
   catch(e){db=null;renderBanner();return}
   fbAuth.onAuthStateChanged(async u=>{
     if(!u){try{await fbAuth.signInAnonymously()}catch(e){loadFailed=true;renderBanner()}return}
-    uid=u.uid;isTeacher=!u.isAnonymous&&!!u.email;
+    const prev=uid;uid=u.uid;isTeacher=!u.isAnonymous&&!!u.email;
+    if(prev&&prev!==uid&&mode==="session")startPractice();
     $("tpanel").hidden=!isTeacher;$("tlogin").hidden=isTeacher;
     joinHtml="";formFilled=false;session=null;players={};scores={};
     startListeners();renderBanner();renderJoin();renderRoster();renderBoard();
