@@ -741,11 +741,29 @@ function expireQuestion(){
 }
 
 let pushing=Promise.resolve(),pushWarned=false;
+function saveStatus(ok,msg){
+  const s=$("savest");if(s){s.textContent=msg;s.style.color=ok?"":"var(--no,#b3261e)"}
+  const r=$("resave");if(r)r.hidden=ok
+}
 function pushScore(final){
   if(!db||!uid||mode!=="session"||!sessRun)return;
   const data={runId:sessRun,score,solved,answered,done:!!final,ts:Date.now()};
-  pushing=pushing.then(()=>db.doc("scores/"+uid).set(data)).catch(e=>{
-    if(!pushWarned){pushWarned=true;const f=$("fb");if(f){f.className="fb no";f.textContent="Skor belum terkirim ke guru. Periksa koneksi internet."}}
+  const send=async()=>{
+    let last=null;
+    for(let i=0;i<(final?4:1);i++){
+      try{await db.doc("scores/"+uid).set(data);return}
+      catch(e){last=e;if(e&&e.code==="permission-denied")break;await new Promise(r=>setTimeout(r,1500*(i+1)))}
+    }
+    throw last;
+  };
+  pushing=pushing.then(send).then(()=>{if(final)saveStatus(true,"Hasil sudah tersimpan dan terkirim ke papan skor guru.")}).catch(e=>{
+    const code=(e&&(e.code||e.message))||"error";
+    const msg=code==="permission-denied"
+      ?"Hasil DITOLAK server ("+code+"). Pastikan kamu sudah mendaftar di lobi dan belum dikeluarkan guru; kalau tetap gagal, beri tahu guru."
+      :"Hasil belum tersimpan ("+code+"). Periksa internet lalu tekan Simpan ulang.";
+    if(final)saveStatus(false,msg);
+    else if(!pushWarned){pushWarned=true;const f=$("fb");if(f){f.className="fb no";f.textContent=msg}}
+    window.__lastScoreErr=code;
   });
 }
 
@@ -759,9 +777,10 @@ function finish(reason){
       <div class="stars" aria-hidden="true">★</div>
       <h2>${reason||"Sesi selesai"}</h2>
       <p style="margin:0">Skor kamu <strong>${score}</strong>. Benar ${solved} dari ${total} soal.</p>
-      <p class="note">Hasil dikirim ke papan skor.</p>
-      <div class="actions" style="justify-content:center"><button class="b" id="topractice">Latihan bebas</button></div></div>`;
+      <p class="note" id="savest">Menyimpan hasil…</p>
+      <div class="actions" style="justify-content:center"><button class="b main" id="resave" hidden>Simpan ulang</button><button class="b" id="topractice">Latihan bebas</button></div></div>`;
     $("topractice").onclick=()=>startPractice();
+    $("resave").onclick=()=>{saveStatus(true,"Menyimpan hasil…");pushScore(true)};
     renderJoin();renderBanner();
     return;
   }
@@ -775,6 +794,7 @@ function finish(reason){
     <div class="stars" aria-label="${st} dari 3 bintang">${"★".repeat(st)}${"☆".repeat(3-st)}</div>
     <h2>Latihan selesai</h2>
     <p style="margin:0">Skor kamu ${score} dari ${max}.</p>
+    <p class="note">Latihan bebas hanya menyimpan skor terbaik di perangkat ini dan tidak dikirim ke guru. Untuk hasil yang tersimpan di guru, ikuti sesi saat guru membukanya.</p>
     <div class="actions" style="justify-content:center">
       <button class="b main" id="again">Main lagi</button>
       <button class="b" id="nextlv">Tema: ${LEVELS[nextLv].id}</button>
