@@ -221,6 +221,7 @@ fieldset.fld{border:0;padding:0;margin:0}
   </details>
 
   <div class="kelasbar" id="kelasbar" role="group" aria-label="Pilih kelas"></div>
+  <div class="rowf" id="pcfg" hidden></div>
   <div class="levels" id="levels" role="group" aria-label="Pilih tema latihan"></div>
 
   <section class="card" id="card" aria-live="polite"></section>
@@ -604,9 +605,9 @@ let history={},archiving=null,archiveBlock=0,loaded={p:false,s:false,h:false};
 let mode="practice",gameOver=false,sessRun=null,sessCfg=null,offset=0;
 let lv=0,qi=0,score=0,solved=0,answered=0,tries=0,hinted=0,done=false,qStart=0,qExpired=false;
 let round=[],bank=[],slots=[];
-let kelas=11;
+let kelas=LEVELS[lv].kelas||11;
 let best=LEVELS.map(()=>0);
-try{const s=JSON.parse(localStorage.getItem("susun-best2")||"[]");if(Array.isArray(s))best=LEVELS.map((_,i)=>+s[i]||0)}catch(e){}
+try{const s=JSON.parse(localStorage.getItem("susun-best3")||"[]");if(Array.isArray(s))best=LEVELS.map((_,i)=>+s[i]||0)}catch(e){}
 
 const roman=k=>({10:"X",11:"XI",12:"XII"})[k]||"XI";const isK=th=>/^k\d+$/.test(th);
 const poolOf=th=>th==="all"?LEVELS.flatMap(l=>l.items):isK(th)?LEVELS.filter(l=>l.kelas===+th.slice(1)).flatMap(l=>l.items):LEVELS[+th].items;
@@ -620,25 +621,34 @@ const myScore=()=>{const s=scores[uid];return s&&session&&s.runId===session.runI
 const teamName=id=>{const t=(session&&session.teams||[]).find(x=>x.id===id);return t?t.name:""};
 
 /* ---------- permainan ---------- */
+const DEMO_N=3;
+let practN=8;try{const v=+localStorage.getItem("susun-pn");if(v>=1&&v<=25)practN=v}catch(e){}
+const practCount=()=>isTeacher?practN:DEMO_N;
 const cur=()=>round[qi];
 const words=()=>cur().w.split(" ");
 
 function renderLevels(){
   const sess=mode==="session";
   $("levels").hidden=sess;$("kelasbar").hidden=sess;
+  const pc=$("pcfg");pc.hidden=sess;
+  if(!sess){
+    if(isTeacher)pc.innerHTML=`<label class="fld" style="margin:0"><span>Soal per putaran latihan (khusus guru)</span><select id="prcount" aria-label="Jumlah soal latihan">${[3,5,8,10,15,20,25].map(n=>`<option value="${n}"${n===practN?" selected":""}>${n} soal</option>`).join("")}</select></label>`;
+    else pc.innerHTML=`<p class="note" style="margin:0">Mode demo: latihan dibatasi ${DEMO_N} soal. Untuk soal lengkap, ikuti sesi kelas dari guru.</p>`;
+  }
   $("kelasbar").innerHTML=[10,11,12].map(k=>`<button class="kb" data-k="${k}" aria-pressed="${k===kelas}">Kelas ${roman(k)}</button>`).join("");
-  $("levels").innerHTML=LEVELS.map((l,i)=>l.kelas!==kelas?"":`<button class="lv" data-i="${i}" aria-pressed="${i===lv}"><span class="ar" lang="ar" dir="rtl">${l.ar}</span><span class="id">${l.id}</span><span class="st">Terbaik: ${best[i]} / 80 · bank ${l.items.length} soal</span></button>`).join("");
+  $("levels").innerHTML=LEVELS.map((l,i)=>l.kelas!==kelas?"":`<button class="lv" data-i="${i}" aria-pressed="${i===lv}"><span class="ar" lang="ar" dir="rtl">${l.ar}</span><span class="id">${l.id}</span><span class="st">Terbaik: ${best[i]}% · bank ${l.items.length} soal</span></button>`).join("");
 }
 $("kelasbar").addEventListener("click",e=>{
   const b=e.target.closest(".kb");if(!b)return;
   const k=+b.dataset.k;if(k===kelas)return;
   kelas=k;lv=LEVELS.findIndex(l=>l.kelas===k);startPractice();
 });
+$("pcfg").addEventListener("change",e=>{if(e.target.id!=="prcount"||!isTeacher)return;practN=+e.target.value;try{localStorage.setItem("susun-pn",String(practN))}catch(x){}startPractice()});
 $("levels").addEventListener("click",e=>{const b=e.target.closest(".lv");if(!b)return;lv=+b.dataset.i;startPractice()});
 
 function startPractice(){
   mode="practice";gameOver=false;sessRun=null;sessCfg=null;offset=0;
-  round=shuffle(LEVELS[lv].items).slice(0,8);
+  round=shuffle(LEVELS[lv].items).slice(0,practCount());
   qi=0;score=0;solved=0;answered=0;
   $("score").textContent=score;
   renderLevels();renderJoin();
@@ -786,7 +796,7 @@ function finish(reason){
   }
   const l=LEVELS[lv],max=round.length*10,pct=score/max;
   const st=pct>=.85?3:pct>=.6?2:1;
-  if(score>best[lv]){best[lv]=score;try{localStorage.setItem("susun-best2",JSON.stringify(best))}catch(e){}}
+  const bp=Math.round(pct*100);if(bp>best[lv]){best[lv]=bp;try{localStorage.setItem("susun-best3",JSON.stringify(best))}catch(e){}}
   renderLevels();
   const same=LEVELS.map((x,i)=>i).filter(i=>LEVELS[i].kelas===LEVELS[lv].kelas);
   const nextLv=same[(same.indexOf(lv)+1)%same.length];
@@ -794,7 +804,7 @@ function finish(reason){
     <div class="stars" aria-label="${st} dari 3 bintang">${"★".repeat(st)}${"☆".repeat(3-st)}</div>
     <h2>Latihan selesai</h2>
     <p style="margin:0">Skor kamu ${score} dari ${max}.</p>
-    <p class="note">Latihan bebas hanya menyimpan skor terbaik di perangkat ini dan tidak dikirim ke guru. Untuk hasil yang tersimpan di guru, ikuti sesi saat guru membukanya.</p>
+    <p class="note">${isTeacher?"":"Ini mode demo ("+DEMO_N+" soal). "}Latihan bebas hanya menyimpan skor terbaik di perangkat ini dan tidak dikirim ke guru. Untuk soal lengkap dan hasil yang tersimpan di guru, ikuti sesi saat guru membukanya.</p>
     <div class="actions" style="justify-content:center">
       <button class="b main" id="again">Main lagi</button>
       <button class="b" id="nextlv">Tema: ${LEVELS[nextLv].id}</button>
@@ -1196,7 +1206,7 @@ async function initLive(){
     if(prev&&prev!==uid&&mode==="session")startPractice();
     $("tpanel").hidden=!isTeacher;$("tlogin").hidden=isTeacher;
     joinHtml="";formFilled=false;session=null;players={};scores={};
-    startListeners();renderBanner();renderJoin();renderRoster();renderBoard();
+    startListeners();renderLevels();renderBanner();renderJoin();renderRoster();renderBoard();
   });
 }
 
